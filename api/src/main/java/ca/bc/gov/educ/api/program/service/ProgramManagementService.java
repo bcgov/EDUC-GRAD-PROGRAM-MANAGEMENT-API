@@ -10,8 +10,11 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import ca.bc.gov.educ.api.program.model.dto.GradProgram;
+import ca.bc.gov.educ.api.program.model.dto.GradProgramSet;
+import ca.bc.gov.educ.api.program.model.transformer.GradProgramSetTransformer;
 import ca.bc.gov.educ.api.program.model.transformer.GradProgramTransformer;
 import ca.bc.gov.educ.api.program.repository.GradProgramRepository;
+import ca.bc.gov.educ.api.program.repository.GradProgramSetRepository;
 
 @Service
 public class ProgramManagementService {
@@ -21,6 +24,12 @@ public class ProgramManagementService {
 
     @Autowired
     private GradProgramTransformer gradProgramTransformer;
+    
+    @Autowired
+    private GradProgramSetRepository gradProgramSetRepository;  
+
+    @Autowired
+    private GradProgramSetTransformer gradProgramSetTransformer;
 
     private static Logger logger = LoggerFactory.getLogger(ProgramManagementService.class);
 
@@ -40,4 +49,15 @@ public class ProgramManagementService {
 
         return programList;
     }
+
+	public List<GradProgramSet> getAllProgramSetList(String programCode) {
+		List<GradProgramSet> programSetList  = new ArrayList<GradProgramSet>();
+        try {
+        	programSetList = gradProgramSetTransformer.transformToDTO(gradProgramSetRepository.findByGradProgramCode(programCode));            
+        } catch (Exception e) {
+            logger.debug("Exception:" + e);
+        }
+
+        return programSetList;
+	}
 }
