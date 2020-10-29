@@ -2,16 +2,16 @@
 apiVersion: v1
 kind: Template
 labels:
-  template: 'grad-program_management-api-template'
+  template: 'educ-grad-program_management-api-template'
 metadata:
-  name: 'grad-program_management-api-template'
+  name: 'educ-grad-program_management-api-template'
 objects:
   - apiVersion: v1
     kind: BuildConfig
     metadata:
       labels:
-        build: grad-program_management-api-pipeline
-      name: grad-program_management-api-pipeline
+        build: educ-grad-program_management-api-pipeline
+      name: educ-grad-program_management-api-pipeline
       namespace: wbmfsf-tools
     spec:
       source:
