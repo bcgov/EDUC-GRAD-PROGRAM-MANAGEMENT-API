@@ -7,10 +7,12 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import ca.bc.gov.educ.api.program.model.dto.GradProgram;
+import ca.bc.gov.educ.api.program.model.dto.GradProgramSet;
 import ca.bc.gov.educ.api.program.service.ProgramManagementService;
 import ca.bc.gov.educ.api.program.util.EducGradProgramManagementApiConstants;
 
@@ -28,5 +30,11 @@ public class ProgramManagementController {
     public List<GradProgram> getAllPrograms() { 
     	logger.debug("getAllPrograms : ");
         return programManagementService.getAllProgramList();
+    }
+    
+    @GetMapping(EducGradProgramManagementApiConstants.GET_ALL_PROGRAM_SETS_BY_PROGRAM_CODE)
+    public List<GradProgramSet> getAllPrograms(@PathVariable String programCode) { 
+    	logger.debug("get All Program Sets : ");
+        return programManagementService.getAllProgramSetList(programCode);
     }
 }

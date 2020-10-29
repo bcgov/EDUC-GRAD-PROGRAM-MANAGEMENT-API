@@ -5,9 +5,9 @@
     <modelVersion>4.0.0</modelVersion>
 
     <groupId>ca.bc.gov.educ</groupId>
-	<artifactId>grad-program_management-api</artifactId>
+	<artifactId>educ-grad-program_management-api</artifactId>
 	<version>0.0.1-SNAPSHOT</version>
-	<name>grad-program_management-api</name>
+	<name>educ-grad-program-management-api</name>
 	<description>Ministry of Education GRAD PROGRAM MANAGEMENT API</description>
    
 
