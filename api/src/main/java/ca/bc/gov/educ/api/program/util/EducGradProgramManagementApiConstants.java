@@ -12,6 +12,7 @@ public class EducGradProgramManagementApiConstants {
 
     //Attribute Constants
     public static final String GET_ALL_PROGRAM_SETS_BY_PROGRAM_CODE = "/programsets/{programCode}";
+    public static final String GET_ALL_PROGRAM_RULES = "/programrules";
 
     //Default Attribute value constants
     public static final String DEFAULT_CREATED_BY = "ProgramManagementAPI";
