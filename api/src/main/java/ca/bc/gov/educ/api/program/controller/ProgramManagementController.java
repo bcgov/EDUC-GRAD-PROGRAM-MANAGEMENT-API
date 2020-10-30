@@ -9,9 +9,11 @@ import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import ca.bc.gov.educ.api.program.model.dto.GradProgram;
+import ca.bc.gov.educ.api.program.model.dto.GradProgramRules;
 import ca.bc.gov.educ.api.program.model.dto.GradProgramSet;
 import ca.bc.gov.educ.api.program.service.ProgramManagementService;
 import ca.bc.gov.educ.api.program.util.EducGradProgramManagementApiConstants;
@@ -36,5 +38,14 @@ public class ProgramManagementController {
     public List<GradProgramSet> getAllPrograms(@PathVariable String programCode) { 
     	logger.debug("get All Program Sets : ");
         return programManagementService.getAllProgramSetList(programCode);
+    }
+    
+    @GetMapping(EducGradProgramManagementApiConstants.GET_ALL_PROGRAM_RULES)
+    public List<GradProgramRules> getAllProgramsRules(
+    		@RequestParam(value = "programCode", required = true) String programCode, 
+            @RequestParam(value = "programSet", required = true) String programSet,
+            @RequestParam(value = "requirementType", required = false) String requirementType) { 
+    	logger.debug("get All Program Rules : ");
+        return programManagementService.getAllProgramRuleList(programCode,programSet,requirementType);
     }
 }
