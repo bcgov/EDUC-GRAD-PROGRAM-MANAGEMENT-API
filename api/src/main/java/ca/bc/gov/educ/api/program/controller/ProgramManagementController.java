@@ -12,9 +12,12 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import ca.bc.gov.educ.api.program.model.dto.GradLetterGrade;
 import ca.bc.gov.educ.api.program.model.dto.GradProgram;
 import ca.bc.gov.educ.api.program.model.dto.GradProgramRules;
 import ca.bc.gov.educ.api.program.model.dto.GradProgramSet;
+import ca.bc.gov.educ.api.program.model.dto.GradRuleDetails;
+import ca.bc.gov.educ.api.program.model.dto.GradSpecialCase;
 import ca.bc.gov.educ.api.program.service.ProgramManagementService;
 import ca.bc.gov.educ.api.program.util.EducGradProgramManagementApiConstants;
 
@@ -47,5 +50,35 @@ public class ProgramManagementController {
             @RequestParam(value = "requirementType", required = false) String requirementType) { 
     	logger.debug("get All Program Rules : ");
         return programManagementService.getAllProgramRuleList(programCode,programSet,requirementType);
+    }
+    
+    @GetMapping(EducGradProgramManagementApiConstants.GET_ALL_SPECIAL_CASE_MAPPING)
+    public List<GradSpecialCase> getAllSpecialCases() { 
+    	logger.debug("getAllSpecialCases : ");
+        return programManagementService.getAllSpecialCaseList();
+    }
+    
+    @GetMapping(EducGradProgramManagementApiConstants.GET_ALL_SPECIAL_CASE__BY_SPECIAL_CODE)
+    public GradSpecialCase getSpecificSpecialCases(@PathVariable String specialCode) { 
+    	logger.debug("getSpecificSpecialCases : ");
+        return programManagementService.getSpecificSpecialCase(specialCode);
+    }
+    
+    @GetMapping(EducGradProgramManagementApiConstants.GET_ALL_SPECIFIC_PROGRAM_RULES_BY_RULE)
+    public GradRuleDetails getSpecificRuleDetails(@PathVariable String ruleCode) { 
+    	logger.debug("getSpecificRuleDetails : ");
+        return programManagementService.getSpecificRuleDetails(ruleCode);
+    }
+    
+    @GetMapping(EducGradProgramManagementApiConstants.GET_ALL_LETTER_GRADE_MAPPING)
+    public List<GradLetterGrade> getAllLetterGrades() { 
+    	logger.debug("getAllLetterGrades : ");
+        return programManagementService.getAllLetterGradesList();
+    }
+    
+    @GetMapping(EducGradProgramManagementApiConstants.GET_ALL_LETTER_GRADE__BY_LETTER_GRADE)
+    public GradLetterGrade getSpecificLetterGrade(@PathVariable String letterGrade) { 
+    	logger.debug("getSpecificLetterGrade : ");
+        return programManagementService.getSpecificLetterGrade(letterGrade);
     }
 }
