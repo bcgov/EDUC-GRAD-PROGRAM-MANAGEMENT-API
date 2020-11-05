@@ -19,7 +19,7 @@ public class GradLetterGradeEntity {
    
 	@Id
 	@Column(name = "LETTER_GRADE", nullable = false)
-    private String programCode; 
+    private String letterGrade; 
 	
 	@Column(name = "GPA_MARK_VALUE", nullable = true)
     private String gpaMarkValue; 
