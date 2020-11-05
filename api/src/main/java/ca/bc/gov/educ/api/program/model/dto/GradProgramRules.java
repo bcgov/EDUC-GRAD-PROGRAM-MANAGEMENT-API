@@ -21,7 +21,7 @@ public class GradProgramRules {
 	private String languageOfInstruction;
 	private String requirementDesc;
 	private String isActive;
-	private String programSetID;
+	private UUID programSetID;
 	private String createdBy;
 	private Date createdTimestamp;
 	private String updatedBy;
