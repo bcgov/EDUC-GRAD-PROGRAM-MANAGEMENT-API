@@ -8,7 +8,7 @@ import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
-import ca.bc.gov.educ.api.program.model.dto.GradProgramRules;
+import ca.bc.gov.educ.api.program.model.dto.GradProgramRule;
 import ca.bc.gov.educ.api.program.model.entity.GradProgramRulesEntity;
 
 
@@ -18,32 +18,32 @@ public class GradProgramRulesTransformer {
     @Autowired
     ModelMapper modelMapper;
 
-    public GradProgramRules transformToDTO (GradProgramRulesEntity gradProgramEntity) {
-    	GradProgramRules gradProgramRules = modelMapper.map(gradProgramEntity, GradProgramRules.class);
-        return gradProgramRules;
+    public GradProgramRule transformToDTO (GradProgramRulesEntity gradProgramEntity) {
+    	GradProgramRule gradProgramRule = modelMapper.map(gradProgramEntity, GradProgramRule.class);
+        return gradProgramRule;
     }
 
-    public GradProgramRules transformToDTO ( Optional<GradProgramRulesEntity> gradProgramSetEntity ) {
+    public GradProgramRule transformToDTO (Optional<GradProgramRulesEntity> gradProgramSetEntity ) {
     	GradProgramRulesEntity cae = new GradProgramRulesEntity();
         if (gradProgramSetEntity.isPresent())
             cae = gradProgramSetEntity.get();
 
-        GradProgramRules gradProgramRules = modelMapper.map(cae, GradProgramRules.class);
-        return gradProgramRules;
+        GradProgramRule gradProgramRule = modelMapper.map(cae, GradProgramRule.class);
+        return gradProgramRule;
     }
 
-	public List<GradProgramRules> transformToDTO (Iterable<GradProgramRulesEntity> gradProgramSetEntities ) {
-		List<GradProgramRules> programSetList = new ArrayList<GradProgramRules>();
+	public List<GradProgramRule> transformToDTO (Iterable<GradProgramRulesEntity> gradProgramSetEntities ) {
+		List<GradProgramRule> programSetList = new ArrayList<GradProgramRule>();
         for (GradProgramRulesEntity gradProgramSetEntity : gradProgramSetEntities) {
-        	GradProgramRules programSet = new GradProgramRules();
-        	programSet = modelMapper.map(gradProgramSetEntity, GradProgramRules.class);            
+        	GradProgramRule programSet = new GradProgramRule();
+        	programSet = modelMapper.map(gradProgramSetEntity, GradProgramRule.class);
         	programSetList.add(programSet);
         }
         return programSetList;
     }
 
-    public GradProgramRulesEntity transformToEntity(GradProgramRules gradProgramRules) {
-        GradProgramRulesEntity gradProgramSetEntity = modelMapper.map(gradProgramRules, GradProgramRulesEntity.class);
+    public GradProgramRulesEntity transformToEntity(GradProgramRule gradProgramRule) {
+        GradProgramRulesEntity gradProgramSetEntity = modelMapper.map(gradProgramRule, GradProgramRulesEntity.class);
         return gradProgramSetEntity;
     }
 }
