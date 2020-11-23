@@ -2,6 +2,7 @@ package ca.bc.gov.educ.api.program.controller;
 
 import java.util.List;
 
+import ca.bc.gov.educ.api.program.model.dto.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -12,12 +13,6 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
-import ca.bc.gov.educ.api.program.model.dto.GradLetterGrade;
-import ca.bc.gov.educ.api.program.model.dto.GradProgram;
-import ca.bc.gov.educ.api.program.model.dto.GradProgramRules;
-import ca.bc.gov.educ.api.program.model.dto.GradProgramSet;
-import ca.bc.gov.educ.api.program.model.dto.GradRuleDetails;
-import ca.bc.gov.educ.api.program.model.dto.GradSpecialCase;
 import ca.bc.gov.educ.api.program.service.ProgramManagementService;
 import ca.bc.gov.educ.api.program.util.EducGradProgramManagementApiConstants;
 
@@ -38,13 +33,13 @@ public class ProgramManagementController {
     }
     
     @GetMapping(EducGradProgramManagementApiConstants.GET_ALL_PROGRAM_SETS_BY_PROGRAM_CODE)
-    public List<GradProgramSet> getAllPrograms(@PathVariable String programCode) { 
+    public GradProgramSets getAllPrograms(@PathVariable String programCode) {
     	logger.debug("get All Program Sets : ");
         return programManagementService.getAllProgramSetList(programCode);
     }
     
     @GetMapping(EducGradProgramManagementApiConstants.GET_ALL_PROGRAM_RULES)
-    public List<GradProgramRules> getAllProgramsRules(
+    public List<GradProgramRule> getAllProgramsRules(
     		@RequestParam(value = "programCode", required = true) String programCode, 
             @RequestParam(value = "programSet", required = true) String programSet,
             @RequestParam(value = "requirementType", required = false) String requirementType) { 
@@ -71,9 +66,11 @@ public class ProgramManagementController {
     }
     
     @GetMapping(EducGradProgramManagementApiConstants.GET_ALL_LETTER_GRADE_MAPPING)
-    public List<GradLetterGrade> getAllLetterGrades() { 
+    public GradLetterGrades getAllLetterGrades() {
     	logger.debug("getAllLetterGrades : ");
-        return programManagementService.getAllLetterGradesList();
+        GradLetterGrades gradLetterGrades = new GradLetterGrades();
+        gradLetterGrades.setGradLetterGradeList(programManagementService.getAllLetterGradesList());
+        return gradLetterGrades;
     }
     
     @GetMapping(EducGradProgramManagementApiConstants.GET_ALL_LETTER_GRADE__BY_LETTER_GRADE)

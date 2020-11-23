@@ -19,6 +19,9 @@ public interface GradProgramRulesRepository extends JpaRepository<GradProgramRul
     + "(:requirementType is null or c.requirementType=:requirementType)")
 	List<GradProgramRulesEntity> findByProgramSetIDAndRequirementType(UUID programSetID, String requirementType);
 
-	Optional<GradProgramRulesEntity> findByRuleCode(String ruleCode);
+    @Override
+    List<GradProgramRulesEntity> findAllById(Iterable<UUID> iterable);
+
+    Optional<GradProgramRulesEntity> findByRuleCode(String ruleCode);
 
 }
