@@ -5,17 +5,12 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
+import ca.bc.gov.educ.api.program.model.dto.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import ca.bc.gov.educ.api.program.model.dto.GradLetterGrade;
-import ca.bc.gov.educ.api.program.model.dto.GradProgram;
-import ca.bc.gov.educ.api.program.model.dto.GradProgramRules;
-import ca.bc.gov.educ.api.program.model.dto.GradProgramSet;
-import ca.bc.gov.educ.api.program.model.dto.GradRuleDetails;
-import ca.bc.gov.educ.api.program.model.dto.GradSpecialCase;
 import ca.bc.gov.educ.api.program.model.transformer.GradLetterGradeTransformer;
 import ca.bc.gov.educ.api.program.model.transformer.GradProgramRulesTransformer;
 import ca.bc.gov.educ.api.program.model.transformer.GradProgramSetTransformer;
@@ -79,20 +74,24 @@ public class ProgramManagementService {
         return programList;
     }
 
-	public List<GradProgramSet> getAllProgramSetList(String programCode) {
-		List<GradProgramSet> programSetList  = new ArrayList<GradProgramSet>();
+	public GradProgramSets getAllProgramSetList(String programCode) {
+
+        GradProgramSets gradProgramSets = new GradProgramSets();
+
         try {
-        	programSetList = gradProgramSetTransformer.transformToDTO(gradProgramSetRepository.findByGradProgramCode(programCode));            
+        	gradProgramSets.setGradProgramSetList(gradProgramSetTransformer
+                    .transformToDTO(gradProgramSetRepository.findByGradProgramCode(programCode)));
+        	logger.debug("Number of Grad Program Sets for " + programCode + " : " + gradProgramSets.getGradProgramSetList().size());
         } catch (Exception e) {
             logger.debug("Exception:" + e);
         }
 
-        return programSetList;
+        return gradProgramSets;
 	}
 
-	public List<GradProgramRules> getAllProgramRuleList(String programCode, String programSet, String requirementType) {
+	public List<GradProgramRule> getAllProgramRuleList(String programCode, String programSet, String requirementType) {
 		UUID programSetID = gradProgramSetRepository.findIdByGradProgramCodeAndProgramSet(programCode,programSet);
-		List<GradProgramRules> programRuleList  = new ArrayList<GradProgramRules>();
+		List<GradProgramRule> programRuleList  = new ArrayList<GradProgramRule>();
         try {
         	programRuleList = gradProgramRulesTransformer.transformToDTO(gradProgramRulesRepository.findByProgramSetIDAndRequirementType(programSetID,requirementType));            
         } catch (Exception e) {
@@ -118,11 +117,11 @@ public class ProgramManagementService {
 
 	public GradRuleDetails getSpecificRuleDetails(String ruleCode) {
 		GradRuleDetails details = new GradRuleDetails();
-		GradProgramRules gradProgramRules = gradProgramRulesTransformer.transformToDTO(gradProgramRulesRepository.findByRuleCode(ruleCode));
-		if(gradProgramRules != null) {
-			details.setRuleCode(gradProgramRules.getRuleCode());
-			details.setRequirementName(gradProgramRules.getRequirementName());
-			GradProgramSet gradProgramSet = gradProgramSetTransformer.transformToDTO(gradProgramSetRepository.getOne(gradProgramRules.getProgramSetID()));
+		GradProgramRule gradProgramRule = gradProgramRulesTransformer.transformToDTO(gradProgramRulesRepository.findByRuleCode(ruleCode));
+		if(gradProgramRule != null) {
+			details.setRuleCode(gradProgramRule.getRuleCode());
+			details.setRequirementName(gradProgramRule.getRequirementName());
+			GradProgramSet gradProgramSet = gradProgramSetTransformer.transformToDTO(gradProgramSetRepository.getOne(gradProgramRule.getProgramSetID()));
 			if(gradProgramSet != null) {
 				details.setProgramSet(gradProgramSet.getProgramSet());
 				details.setProgramCode(gradProgramSet.getGradProgramCode());

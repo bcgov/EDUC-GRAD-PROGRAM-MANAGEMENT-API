@@ -9,7 +9,7 @@ import lombok.Data;
 
 @Data
 @Component
-public class GradProgramRules {
+public class GradProgramRule {
 
 	private UUID id;
     private String ruleCode; 
