@@ -22,6 +22,7 @@ public class GradProgramRule {
 	private String requirementDesc;
 	private String isActive;
 	private UUID programSetID;
+	private Date activeDate;
 	private String createdBy;
 	private Date createdTimestamp;
 	private String updatedBy;

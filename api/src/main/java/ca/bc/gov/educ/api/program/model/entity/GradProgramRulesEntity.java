@@ -52,6 +52,9 @@ public class GradProgramRulesEntity {
 	@Column(name = "FK_PROGRAM_SET_ID", nullable = true)
     private UUID programSetID;
 	
+	@Column(name = "ACTIVE_DT", nullable = true)
+    private Date activeDate;
+	
 	@Column(name = "CREATED_BY", nullable = true)
     private String createdBy;
 	
