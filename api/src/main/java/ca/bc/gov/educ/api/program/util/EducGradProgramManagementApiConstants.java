@@ -19,6 +19,8 @@ public class EducGradProgramManagementApiConstants {
     public static final String GET_ALL_SPECIAL_CASE__BY_SPECIAL_CODE = "/specialcase/{specialCode}";
     public static final String GET_ALL_LETTER_GRADE__BY_LETTER_GRADE = "/lettergrade/{letterGrade}";
     public static final String GET_ALL_SPECIFIC_PROGRAM_RULES_BY_RULE = "/programrules/{ruleCode}";
+    
+    public static final String ENDPOINT_PROGRAM_TYPE_BY_CODE_URL = "${endpoint.code-api.program-type_by_code.url}";
 
     //Default Attribute value constants
     public static final String DEFAULT_CREATED_BY = "ProgramManagementAPI";

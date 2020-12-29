@@ -13,7 +13,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.oauth2.config.annotation.web.configuration.EnableResourceServer;
+import org.springframework.security.oauth2.provider.authentication.OAuth2AuthenticationDetails;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -66,26 +68,34 @@ public class ProgramManagementController {
     public ResponseEntity<ApiResponseModel<GradProgram>> createGradPrograms(@Valid @RequestBody GradProgram gradProgram) { 
     	logger.debug("createGradPrograms : ");
     	validation.requiredField(gradProgram.getProgramCode(), "Program Code");
+    	validation.requiredField(gradProgram.getProgramType(), "Program Type");
+    	validation.requiredField(gradProgram.getProgramName(), "Program Name");
     	if(validation.hasErrors()) {
     		validation.stopOnErrors();
     		return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
     	}
-        return response.CREATED(programManagementService.createGradProgram(gradProgram));
+    	OAuth2AuthenticationDetails auth = (OAuth2AuthenticationDetails) SecurityContextHolder.getContext().getAuthentication().getDetails(); 
+    	String accessToken = auth.getTokenValue();
+        return response.CREATED(programManagementService.createGradProgram(gradProgram,accessToken));
     }
     
     @PutMapping(EducGradProgramManagementApiConstants.GET_ALL_PROGRAM_MAPPING)
     @PreAuthorize(PermissionsContants.UPDATE_GRAD_PROGRAM)
     public ResponseEntity<ApiResponseModel<GradProgram>> updateGradPrograms(@Valid @RequestBody GradProgram gradProgram) { 
-    	logger.debug("createGradPrograms : ");
+    	logger.debug("updateGradPrograms : ");
     	validation.requiredField(gradProgram.getProgramCode(), "Program Code");
+    	validation.requiredField(gradProgram.getProgramType(), "Program Type");
+    	validation.requiredField(gradProgram.getProgramName(), "Program Name");
     	if(validation.hasErrors()) {
     		validation.stopOnErrors();
     		return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
     	}
-        return response.UPDATED(programManagementService.updateGradProgram(gradProgram),GradProgram.class);
+    	OAuth2AuthenticationDetails auth = (OAuth2AuthenticationDetails) SecurityContextHolder.getContext().getAuthentication().getDetails(); 
+    	String accessToken = auth.getTokenValue();
+        return response.UPDATED(programManagementService.updateGradProgram(gradProgram,accessToken),GradProgram.class);
     }
     
-    @DeleteMapping(EducGradProgramManagementApiConstants.GET_ALL_PROGRAM_MAPPING)
+    @DeleteMapping(EducGradProgramManagementApiConstants.DELETE_PROGRAM_MAPPING)
     @PreAuthorize(PermissionsContants.DELETE_GRAD_PROGRAM)
     public ResponseEntity<Void> deleteGradPrograms(@Valid @PathVariable String programCode) { 
     	logger.debug("deleteGradPrograms : ");

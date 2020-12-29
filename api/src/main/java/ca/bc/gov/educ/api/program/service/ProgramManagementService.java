@@ -12,13 +12,19 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.http.HttpEntity;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpMethod;
 import org.springframework.stereotype.Service;
+import org.springframework.web.client.RestTemplate;
 
 import ca.bc.gov.educ.api.program.model.dto.GradLetterGrade;
 import ca.bc.gov.educ.api.program.model.dto.GradProgram;
 import ca.bc.gov.educ.api.program.model.dto.GradProgramRule;
 import ca.bc.gov.educ.api.program.model.dto.GradProgramSet;
 import ca.bc.gov.educ.api.program.model.dto.GradProgramSets;
+import ca.bc.gov.educ.api.program.model.dto.GradProgramTypes;
 import ca.bc.gov.educ.api.program.model.dto.GradRuleDetails;
 import ca.bc.gov.educ.api.program.model.dto.GradSpecialCase;
 import ca.bc.gov.educ.api.program.model.entity.GradProgramEntity;
@@ -32,6 +38,9 @@ import ca.bc.gov.educ.api.program.repository.GradProgramRepository;
 import ca.bc.gov.educ.api.program.repository.GradProgramRulesRepository;
 import ca.bc.gov.educ.api.program.repository.GradProgramSetRepository;
 import ca.bc.gov.educ.api.program.repository.GradSpecialCaseRepository;
+import ca.bc.gov.educ.api.program.util.EducGradProgramManagementApiConstants;
+import ca.bc.gov.educ.api.program.util.EducGradProgramManagementApiUtils;
+import ca.bc.gov.educ.api.program.util.GradBusinessRuleException;
 import ca.bc.gov.educ.api.program.util.GradValidation;
 
 @Service
@@ -69,6 +78,12 @@ public class ProgramManagementService {
     
     @Autowired
 	GradValidation validation;
+    
+    @Value(EducGradProgramManagementApiConstants.ENDPOINT_PROGRAM_TYPE_BY_CODE_URL)
+    private String getProgramTypeByCodeURL;
+    
+    @Autowired
+    RestTemplate restTemplate;
 
     private static Logger logger = LoggerFactory.getLogger(ProgramManagementService.class);
 
@@ -160,7 +175,8 @@ public class ProgramManagementService {
 		return gradLetterGradeTransformer.transformToDTO(gradLetterGradeRepository.findById(letterGrade));
 	}
 
-	public GradProgram createGradProgram(GradProgram gradProgram) {
+	public GradProgram createGradProgram(GradProgram gradProgram,String accessToken) {
+		HttpHeaders httpHeaders = EducGradProgramManagementApiUtils.getHeaders(accessToken);
 		GradProgramEntity toBeSavedObject = gradProgramTransformer.transformToEntity(gradProgram);
 		Optional<GradProgramEntity> existingObjectCheck = gradProgramRepository.findById(gradProgram.getProgramCode());
 		if(existingObjectCheck.isPresent()) {
@@ -168,17 +184,42 @@ public class ProgramManagementService {
 			return gradProgram;
 			
 		}else {
-			return gradProgramTransformer.transformToDTO(gradProgramRepository.save(toBeSavedObject));			
+			try {
+			GradProgramTypes programTypes = restTemplate.exchange(String.format(getProgramTypeByCodeURL,gradProgram.getProgramType()), HttpMethod.GET,
+    				new HttpEntity<>(httpHeaders), GradProgramTypes.class).getBody();
+    		if(programTypes != null) { 
+    			return gradProgramTransformer.transformToDTO(gradProgramRepository.save(toBeSavedObject));    			
+    		}else {
+    			validation.addErrorAndStop(String.format("Program Type [%s] is not Valid",gradProgram.getProgramType()));
+    			return gradProgram;
+    		}	
+			}catch(Exception c) {
+				validation.addErrorAndStop(String.format("Program Type [%s] is not Valid",gradProgram.getProgramType()));
+				throw new GradBusinessRuleException();
+			}
 		}		
 	}
 	
-	public GradProgram updateGradProgram(GradProgram gradProgram) {
+	public GradProgram updateGradProgram(GradProgram gradProgram,String accessToken) {
+		HttpHeaders httpHeaders = EducGradProgramManagementApiUtils.getHeaders(accessToken);
 		Optional<GradProgramEntity> gradProgramOptional = gradProgramRepository.findById(gradProgram.getProgramCode());
 		GradProgramEntity sourceObject = gradProgramTransformer.transformToEntity(gradProgram);
 		if(gradProgramOptional.isPresent()) {
-			GradProgramEntity gradEnity = gradProgramOptional.get();			
-			BeanUtils.copyProperties(sourceObject,gradEnity,"createdBy","createdTimestamp");
-			return gradProgramTransformer.transformToDTO(gradProgramRepository.save(gradEnity));
+			try {
+				GradProgramEntity gradEnity = gradProgramOptional.get();			
+				BeanUtils.copyProperties(sourceObject,gradEnity,"createdBy","createdTimestamp");
+				GradProgramTypes programTypes = restTemplate.exchange(String.format(getProgramTypeByCodeURL,gradProgram.getProgramType()), HttpMethod.GET,
+	    				new HttpEntity<>(httpHeaders), GradProgramTypes.class).getBody();
+	    		if(programTypes != null) {
+	    			return gradProgramTransformer.transformToDTO(gradProgramRepository.save(gradEnity));
+	    		}else {
+	    			validation.addErrorAndStop(String.format("Program Type [%s] is not Valid",gradProgram.getProgramType()));
+	    			return gradProgram;
+	    		}
+			}catch(Exception c) {
+				validation.addErrorAndStop(String.format("Program Type [%s] is not Valid",gradProgram.getProgramType()));
+				throw new GradBusinessRuleException();
+			}
 		}else {
 			validation.addErrorAndStop(String.format("Program Code [%s] does not exists",gradProgram.getProgramCode()));
 			return gradProgram;
