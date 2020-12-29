@@ -1,6 +1,6 @@
 package ca.bc.gov.educ.api.program.model.entity;
 
-import java.util.Date;
+import java.sql.Date;
 import java.util.UUID;
 
 import javax.persistence.Column;
@@ -11,12 +11,14 @@ import javax.persistence.Table;
 import org.hibernate.annotations.Immutable;
 
 import lombok.Data;
+import lombok.EqualsAndHashCode;
 
 @Data
+@EqualsAndHashCode(callSuper = false)
 @Immutable
 @Entity
 @Table(name = "GRAD_PROGRAM_SET")
-public class GradProgramSetEntity {
+public class GradProgramSetEntity extends BaseEntity {
    
 	@Id
 	@Column(name = "ID", nullable = false)
@@ -31,15 +33,9 @@ public class GradProgramSetEntity {
 	@Column(name = "FK_GRAD_PROGRAM_CODE", nullable = false)
 	private String gradProgramCode; 
 	
-	@Column(name = "CREATED_BY", nullable = true)
-    private String createdBy;
+	@Column(name = "START_DT", nullable = true)
+    private Date programSetStartDate; 
 	
-	@Column(name = "CREATED_TIMESTAMP", nullable = true)
-    private Date createdTimestamp;
-	
-	@Column(name = "UPDATED_BY", nullable = true)
-    private String updatedBy;
-	
-	@Column(name = "UPDATED_TIMESTAMP", nullable = true)
-    private Date updatedTimestamp;	
+	@Column(name = "END_DT", nullable = true)
+    private Date programSetEndDate;
 }

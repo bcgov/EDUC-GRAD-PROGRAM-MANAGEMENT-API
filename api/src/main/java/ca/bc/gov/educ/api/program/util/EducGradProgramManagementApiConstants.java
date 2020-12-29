@@ -11,6 +11,7 @@ public class EducGradProgramManagementApiConstants {
     public static final String GET_ALL_PROGRAM_MAPPING = "/programs";
     public static final String GET_ALL_SPECIAL_CASE_MAPPING = "/specialcase";
     public static final String GET_ALL_LETTER_GRADE_MAPPING = "/lettergrade";
+    public static final String DELETE_PROGRAM_MAPPING = "/programs/{programCode}";
 
     //Attribute Constants
     public static final String GET_ALL_PROGRAM_SETS_BY_PROGRAM_CODE = "/programsets/{programCode}";
@@ -26,7 +27,7 @@ public class EducGradProgramManagementApiConstants {
     public static final Date DEFAULT_UPDATED_TIMESTAMP = new Date();
 
     //Default Date format constants
-    public static final String DEFAULT_DATE_FORMAT = "dd-MMM-yyyy";
+    public static final String DEFAULT_DATE_FORMAT = "yyyy-MM-dd";
     
     public static final String TRAX_DATE_FORMAT = "yyyyMM";
 }

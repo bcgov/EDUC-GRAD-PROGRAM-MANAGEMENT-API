@@ -2,6 +2,8 @@ package ca.bc.gov.educ.api.program.util;
 
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
+import java.time.LocalDate;
+import java.time.ZoneId;
 import java.util.Date;
 
 public class EducGradProgramManagementApiUtils {
@@ -48,19 +50,40 @@ public class EducGradProgramManagementApiUtils {
         return date;
     }
     
-    public static Date parseTraxDate (String sessionDate) {
+    public static String parseDateFromString (String sessionDate) {
         if (sessionDate == null)
             return null;
 
-        SimpleDateFormat simpleDateFormat = new SimpleDateFormat(EducGradProgramManagementApiConstants.TRAX_DATE_FORMAT);
+        
+        SimpleDateFormat simpleDateFormat = new SimpleDateFormat(EducGradProgramManagementApiConstants.DEFAULT_DATE_FORMAT);
         Date date = new Date();
 
         try {
             date = simpleDateFormat.parse(sessionDate);
+            LocalDate localDate = date.toInstant().atZone(ZoneId.systemDefault()).toLocalDate();
+            return localDate.getYear() +"/"+ String.format("%02d", localDate.getMonthValue());
+            
         } catch (ParseException e) {
             e.printStackTrace();
-        }
+            return null;
+        }       
+    }
+    
+    public static String parseTraxDate (String sessionDate) {
+        if (sessionDate == null)
+            return null;
 
-        return date;
+        SimpleDateFormat simpleDateFormat = new SimpleDateFormat(EducGradProgramManagementApiConstants.DEFAULT_DATE_FORMAT);
+        Date date = new Date();
+
+        try {
+            date = simpleDateFormat.parse(sessionDate);
+            LocalDate localDate = date.toInstant().atZone(ZoneId.systemDefault()).toLocalDate();
+            return localDate.getYear() +"/"+ String.format("%02d", localDate.getMonthValue());
+            
+        } catch (ParseException e) {
+            e.printStackTrace();
+            return null;
+        }       
     }
 }

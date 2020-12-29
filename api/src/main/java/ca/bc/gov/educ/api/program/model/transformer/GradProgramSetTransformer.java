@@ -10,6 +10,7 @@ import org.springframework.stereotype.Component;
 
 import ca.bc.gov.educ.api.program.model.dto.GradProgramSet;
 import ca.bc.gov.educ.api.program.model.entity.GradProgramSetEntity;
+import ca.bc.gov.educ.api.program.util.EducGradProgramManagementApiUtils;
 
 
 @Component
@@ -36,7 +37,9 @@ public class GradProgramSetTransformer {
 		List<GradProgramSet> programSetList = new ArrayList<GradProgramSet>();
         for (GradProgramSetEntity gradProgramSetEntity : gradProgramSetEntities) {
         	GradProgramSet programSet = new GradProgramSet();
-        	programSet = modelMapper.map(gradProgramSetEntity, GradProgramSet.class);            
+        	programSet = modelMapper.map(gradProgramSetEntity, GradProgramSet.class); 
+        	programSet.setProgramSetStartDate(EducGradProgramManagementApiUtils.parseTraxDate(programSet.getProgramSetStartDate() != null ? programSet.getProgramSetStartDate().toString():null));
+        	programSet.setProgramSetEndDate(EducGradProgramManagementApiUtils.parseTraxDate(programSet.getProgramSetEndDate() != null ? programSet.getProgramSetEndDate().toString():null));
         	programSetList.add(programSet);
         }
         return programSetList;

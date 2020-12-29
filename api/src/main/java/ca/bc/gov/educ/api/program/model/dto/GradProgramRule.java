@@ -6,10 +6,12 @@ import java.util.UUID;
 import org.springframework.stereotype.Component;
 
 import lombok.Data;
+import lombok.EqualsAndHashCode;
 
 @Data
+@EqualsAndHashCode(callSuper=false)
 @Component
-public class GradProgramRule {
+public class GradProgramRule extends BaseModel {
 
 	private UUID id;
     private String ruleCode; 
@@ -23,10 +25,6 @@ public class GradProgramRule {
 	private String isActive;
 	private UUID programSetID;
 	private Date activeDate;
-	private String createdBy;
-	private Date createdTimestamp;
-	private String updatedBy;
-	private Date updatedTimestamp;
 	
 	@Override
 	public String toString() {
@@ -34,8 +32,7 @@ public class GradProgramRule {
 				+ ", requirementType=" + requirementType + ", requiredCredits=" + requiredCredits + ", notMetDesc="
 				+ notMetDesc + ", requiredLevel=" + requiredLevel + ", languageOfInstruction=" + languageOfInstruction
 				+ ", requirementDesc=" + requirementDesc + ", isActive=" + isActive + ", programSetID=" + programSetID
-				+ ", createdBy=" + createdBy + ", createdTimestamp=" + createdTimestamp + ", updatedBy=" + updatedBy
-				+ ", updatedTimestamp=" + updatedTimestamp + "]";
+				+ "]";
 	}	
 	
 	

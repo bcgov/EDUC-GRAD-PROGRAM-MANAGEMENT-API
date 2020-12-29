@@ -5,10 +5,12 @@ import java.sql.Date;
 import org.springframework.stereotype.Component;
 
 import lombok.Data;
+import lombok.EqualsAndHashCode;
 
 @Data
+@EqualsAndHashCode(callSuper=false)
 @Component
-public class GradSpecialCase {
+public class GradSpecialCase extends BaseModel {
 
 	private String specialCase;
 	private String passFlag;	

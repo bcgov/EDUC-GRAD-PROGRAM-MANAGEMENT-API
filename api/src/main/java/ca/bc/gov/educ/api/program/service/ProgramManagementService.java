@@ -3,14 +3,25 @@ package ca.bc.gov.educ.api.program.service;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 import java.util.UUID;
 
-import ca.bc.gov.educ.api.program.model.dto.*;
+import javax.validation.Valid;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import ca.bc.gov.educ.api.program.model.dto.GradLetterGrade;
+import ca.bc.gov.educ.api.program.model.dto.GradProgram;
+import ca.bc.gov.educ.api.program.model.dto.GradProgramRule;
+import ca.bc.gov.educ.api.program.model.dto.GradProgramSet;
+import ca.bc.gov.educ.api.program.model.dto.GradProgramSets;
+import ca.bc.gov.educ.api.program.model.dto.GradRuleDetails;
+import ca.bc.gov.educ.api.program.model.dto.GradSpecialCase;
+import ca.bc.gov.educ.api.program.model.entity.GradProgramEntity;
 import ca.bc.gov.educ.api.program.model.transformer.GradLetterGradeTransformer;
 import ca.bc.gov.educ.api.program.model.transformer.GradProgramRulesTransformer;
 import ca.bc.gov.educ.api.program.model.transformer.GradProgramSetTransformer;
@@ -21,6 +32,7 @@ import ca.bc.gov.educ.api.program.repository.GradProgramRepository;
 import ca.bc.gov.educ.api.program.repository.GradProgramRulesRepository;
 import ca.bc.gov.educ.api.program.repository.GradProgramSetRepository;
 import ca.bc.gov.educ.api.program.repository.GradSpecialCaseRepository;
+import ca.bc.gov.educ.api.program.util.GradValidation;
 
 @Service
 public class ProgramManagementService {
@@ -54,6 +66,9 @@ public class ProgramManagementService {
     
     @Autowired
     private GradLetterGradeRepository gradLetterGradeRepository; 
+    
+    @Autowired
+	GradValidation validation;
 
     private static Logger logger = LoggerFactory.getLogger(ProgramManagementService.class);
 
@@ -143,5 +158,41 @@ public class ProgramManagementService {
 
 	public GradLetterGrade getSpecificLetterGrade(String letterGrade) {
 		return gradLetterGradeTransformer.transformToDTO(gradLetterGradeRepository.findById(letterGrade));
+	}
+
+	public GradProgram createGradProgram(GradProgram gradProgram) {
+		GradProgramEntity toBeSavedObject = gradProgramTransformer.transformToEntity(gradProgram);
+		Optional<GradProgramEntity> existingObjectCheck = gradProgramRepository.findById(gradProgram.getProgramCode());
+		if(existingObjectCheck.isPresent()) {
+			validation.addErrorAndStop(String.format("Program Code [%s] already exists",gradProgram.getProgramCode()));
+			return gradProgram;
+			
+		}else {
+			return gradProgramTransformer.transformToDTO(gradProgramRepository.save(toBeSavedObject));			
+		}		
+	}
+	
+	public GradProgram updateGradProgram(GradProgram gradProgram) {
+		Optional<GradProgramEntity> gradProgramOptional = gradProgramRepository.findById(gradProgram.getProgramCode());
+		GradProgramEntity sourceObject = gradProgramTransformer.transformToEntity(gradProgram);
+		if(gradProgramOptional.isPresent()) {
+			GradProgramEntity gradEnity = gradProgramOptional.get();			
+			BeanUtils.copyProperties(sourceObject,gradEnity,"createdBy","createdTimestamp");
+			return gradProgramTransformer.transformToDTO(gradProgramRepository.save(gradEnity));
+		}else {
+			validation.addErrorAndStop(String.format("Program Code [%s] does not exists",gradProgram.getProgramCode()));
+			return gradProgram;
+		}
+	}
+
+	public int deleteGradPrograms(@Valid String programCode) {
+		Optional<GradProgramEntity> gradProgramOptional = gradProgramRepository.findIfChildRecordsExists(programCode);
+		if(gradProgramOptional.isPresent()) {
+			validation.addErrorAndStop(String.format("This Program [%s] cannot be deleted as it has program sets and rules data associated with it.",gradProgramOptional.get().getProgramCode()));
+			return 0;
+		}else {
+			gradProgramRepository.deleteById(programCode);
+			return 1;
+		}		
 	}
 }
