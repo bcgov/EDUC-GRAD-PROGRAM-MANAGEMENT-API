@@ -115,7 +115,7 @@ public class ProgramManagementController {
     }
     
     @GetMapping(EducGradProgramManagementApiConstants.GET_ALL_PROGRAM_RULES)
-    @PreAuthorize("#oauth2.hasScope('READ_GRAD_PROGRAM_RULES_DATA')")
+    @PreAuthorize(PermissionsContants.READ_GRAD_PROGRAM_RULES)
     public List<GradProgramRule> getAllProgramsRules(
     		@RequestParam(value = "programCode", required = true) String programCode, 
             @RequestParam(value = "programSet", required = true) String programSet,
@@ -127,28 +127,28 @@ public class ProgramManagementController {
     }
     
     @GetMapping(EducGradProgramManagementApiConstants.GET_ALL_SPECIAL_CASE_MAPPING)
-    @PreAuthorize("#oauth2.hasScope('READ_GRAD_SPECIAL_CASE_DATA')")
+    @PreAuthorize(PermissionsContants.READ_GRAD_SPECIAL_CASE)
     public List<GradSpecialCase> getAllSpecialCases() { 
     	logger.debug("getAllSpecialCases : ");
         return programManagementService.getAllSpecialCaseList();
     }
     
     @GetMapping(EducGradProgramManagementApiConstants.GET_ALL_SPECIAL_CASE__BY_SPECIAL_CODE)
-    @PreAuthorize("#oauth2.hasScope('READ_GRAD_SPECIAL_CASE_DATA')")
+    @PreAuthorize(PermissionsContants.READ_GRAD_SPECIAL_CASE)
     public GradSpecialCase getSpecificSpecialCases(@PathVariable String specialCode) { 
     	logger.debug("getSpecificSpecialCases : ");
         return programManagementService.getSpecificSpecialCase(specialCode);
     }
     
     @GetMapping(EducGradProgramManagementApiConstants.GET_ALL_SPECIFIC_PROGRAM_RULES_BY_RULE)
-    @PreAuthorize("#oauth2.hasScope('READ_GRAD_PROGRAM_RULES_DATA')")
+    @PreAuthorize(PermissionsContants.READ_GRAD_PROGRAM_RULES)
     public GradRuleDetails getSpecificRuleDetails(@PathVariable String ruleCode) { 
     	logger.debug("getSpecificRuleDetails : ");
         return programManagementService.getSpecificRuleDetails(ruleCode);
     }
     
     @GetMapping(EducGradProgramManagementApiConstants.GET_ALL_LETTER_GRADE_MAPPING)
-    @PreAuthorize("#oauth2.hasScope('READ_GRAD_LETTER_GRADE_DATA')")
+    @PreAuthorize(PermissionsContants.READ_GRAD_LETTER_GRADE)
     public GradLetterGrades getAllLetterGrades() {
     	logger.debug("getAllLetterGrades : ");
         GradLetterGrades gradLetterGrades = new GradLetterGrades();
@@ -157,7 +157,7 @@ public class ProgramManagementController {
     }
     
     @GetMapping(EducGradProgramManagementApiConstants.GET_ALL_LETTER_GRADE__BY_LETTER_GRADE)
-    @PreAuthorize("#oauth2.hasScope('READ_GRAD_LETTER_GRADE_DATA')")
+    @PreAuthorize(PermissionsContants.READ_GRAD_LETTER_GRADE)
     public GradLetterGrade getSpecificLetterGrade(@PathVariable String letterGrade) { 
     	logger.debug("getSpecificLetterGrade : ");
         return programManagementService.getSpecificLetterGrade(letterGrade);
