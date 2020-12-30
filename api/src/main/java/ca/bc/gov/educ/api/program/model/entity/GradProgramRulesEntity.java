@@ -30,7 +30,7 @@ public class GradProgramRulesEntity  extends BaseEntity {
 	@Column(name = "REQUIREMENT_NAME", nullable = true)
     private String requirementName;
 	
-	@Column(name = "REQUIREMENT_TYPE", nullable = true)
+	@Column(name = "FK_GRAD_REQUIREMENT_TYPE_CODE", nullable = true)
     private String requirementType;
 	
 	@Column(name = "REQUIRED_CREDITS", nullable = true)

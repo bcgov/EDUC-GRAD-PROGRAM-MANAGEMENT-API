@@ -17,6 +17,7 @@ public class GradProgramRule extends BaseModel {
     private String ruleCode; 
 	private String requirementName;
 	private String requirementType;
+	private String requirementTypeDesc;
 	private String requiredCredits;
 	private String notMetDesc;
 	private String requiredLevel;

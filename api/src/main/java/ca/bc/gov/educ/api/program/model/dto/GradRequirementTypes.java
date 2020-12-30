@@ -8,14 +8,14 @@ import lombok.EqualsAndHashCode;
 @Data
 @EqualsAndHashCode(callSuper = false)
 @Component
-public class GradProgramTypes extends BaseModel {
+public class GradRequirementTypes extends BaseModel {
 
 	private String code;	
 	private String description;	
 	
 	@Override
 	public String toString() {
-		return "GradProgramTypes [code=" + code + ", description=" + description + "]";
+		return "GradRequirementTypes [code=" + code + ", description=" + description + "]";
 	}
 	
 	

@@ -21,7 +21,7 @@ public class EducGradProgramManagementApiConstants {
     public static final String GET_ALL_SPECIFIC_PROGRAM_RULES_BY_RULE = "/programrules/{ruleCode}";
     
     public static final String ENDPOINT_PROGRAM_TYPE_BY_CODE_URL = "${endpoint.code-api.program-type_by_code.url}";
-
+    public static final String ENDPOINT_REQUIREMENT_TYPE_BY_CODE_URL = "${endpoint.code-api.requirement-type_by_code.url}";
     //Default Attribute value constants
     public static final String DEFAULT_CREATED_BY = "ProgramManagementAPI";
     public static final Date DEFAULT_CREATED_TIMESTAMP = new Date();

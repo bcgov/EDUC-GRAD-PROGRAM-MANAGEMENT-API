@@ -8,6 +8,7 @@ import java.util.UUID;
 
 import javax.validation.Valid;
 
+import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.BeanUtils;
@@ -25,6 +26,7 @@ import ca.bc.gov.educ.api.program.model.dto.GradProgramRule;
 import ca.bc.gov.educ.api.program.model.dto.GradProgramSet;
 import ca.bc.gov.educ.api.program.model.dto.GradProgramSets;
 import ca.bc.gov.educ.api.program.model.dto.GradProgramTypes;
+import ca.bc.gov.educ.api.program.model.dto.GradRequirementTypes;
 import ca.bc.gov.educ.api.program.model.dto.GradRuleDetails;
 import ca.bc.gov.educ.api.program.model.dto.GradSpecialCase;
 import ca.bc.gov.educ.api.program.model.entity.GradProgramEntity;
@@ -82,6 +84,9 @@ public class ProgramManagementService {
     @Value(EducGradProgramManagementApiConstants.ENDPOINT_PROGRAM_TYPE_BY_CODE_URL)
     private String getProgramTypeByCodeURL;
     
+    @Value(EducGradProgramManagementApiConstants.ENDPOINT_REQUIREMENT_TYPE_BY_CODE_URL)
+    private String getRequirementTypeByCodeURL;    
+    
     @Autowired
     RestTemplate restTemplate;
 
@@ -119,13 +124,24 @@ public class ProgramManagementService {
         return gradProgramSets;
 	}
 
-	public List<GradProgramRule> getAllProgramRuleList(String programCode, String programSet, String requirementType) {
+	public List<GradProgramRule> getAllProgramRuleList(String programCode, String programSet, String requirementType,String accessToken) {
 		UUID programSetID = gradProgramSetRepository.findIdByGradProgramCodeAndProgramSet(programCode,programSet);
+		HttpHeaders httpHeaders = EducGradProgramManagementApiUtils.getHeaders(accessToken);
 		List<GradProgramRule> programRuleList  = new ArrayList<GradProgramRule>();
         try {
-        	programRuleList = gradProgramRulesTransformer.transformToDTO(gradProgramRulesRepository.findByProgramSetIDAndRequirementType(programSetID,requirementType));            
+        	if(StringUtils.isNotBlank(requirementType)) {
+        	restTemplate.exchange(String.format(getRequirementTypeByCodeURL,requirementType), HttpMethod.GET,
+    				new HttpEntity<>(httpHeaders), GradRequirementTypes.class).getBody();
+        	}
+        	programRuleList = gradProgramRulesTransformer.transformToDTO(gradProgramRulesRepository.findByProgramSetIDAndRequirementType(programSetID,requirementType));   
+        	programRuleList.forEach(pR-> {
+        		GradRequirementTypes reqType = restTemplate.exchange(String.format(getRequirementTypeByCodeURL,pR.getRequirementType()), HttpMethod.GET,
+        				new HttpEntity<>(httpHeaders), GradRequirementTypes.class).getBody();
+        		pR.setRequirementTypeDesc(reqType.getDescription());
+        	});
         } catch (Exception e) {
             logger.debug("Exception:" + e);
+            validation.addErrorAndStop(String.format("Requirement Type [%s] is not Valid",requirementType));
         }
         return programRuleList;
 	}

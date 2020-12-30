@@ -121,7 +121,9 @@ public class ProgramManagementController {
             @RequestParam(value = "programSet", required = true) String programSet,
             @RequestParam(value = "requirementType", required = false) String requirementType) { 
     	logger.debug("get All Program Rules : ");
-        return programManagementService.getAllProgramRuleList(programCode,programSet,requirementType);
+    	OAuth2AuthenticationDetails auth = (OAuth2AuthenticationDetails) SecurityContextHolder.getContext().getAuthentication().getDetails(); 
+    	String accessToken = auth.getTokenValue();
+        return programManagementService.getAllProgramRuleList(programCode,programSet,requirementType,accessToken);
     }
     
     @GetMapping(EducGradProgramManagementApiConstants.GET_ALL_SPECIAL_CASE_MAPPING)
