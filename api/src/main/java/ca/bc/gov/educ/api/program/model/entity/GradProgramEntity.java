@@ -5,14 +5,11 @@ import javax.persistence.Entity;
 import javax.persistence.Id;
 import javax.persistence.Table;
 
-import org.hibernate.annotations.Immutable;
-
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 
 @Data
 @EqualsAndHashCode(callSuper=false)
-@Immutable
 @Entity
 @Table(name = "GRAD_PROGRAM")
 public class GradProgramEntity extends BaseEntity {

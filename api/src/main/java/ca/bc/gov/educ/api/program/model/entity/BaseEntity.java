@@ -28,7 +28,6 @@ public class BaseEntity {
 	
 	@PrePersist
 	protected void onCreate() {
-		//TODO: RLO . is this the best place to do this?
 		this.updatedBy = "GRADUATION";
 		this.createdBy = "GRADUATION";
 		this.createdTimestamp = new Date(System.currentTimeMillis());

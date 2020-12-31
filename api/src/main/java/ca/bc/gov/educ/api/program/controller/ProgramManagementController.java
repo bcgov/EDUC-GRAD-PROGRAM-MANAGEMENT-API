@@ -1,6 +1,7 @@
 package ca.bc.gov.educ.api.program.controller;
 
 import java.util.List;
+import java.util.UUID;
 
 import javax.validation.Valid;
 
@@ -82,7 +83,7 @@ public class ProgramManagementController {
     @PutMapping(EducGradProgramManagementApiConstants.GET_ALL_PROGRAM_MAPPING)
     @PreAuthorize(PermissionsContants.UPDATE_GRAD_PROGRAM)
     public ResponseEntity<ApiResponseModel<GradProgram>> updateGradPrograms(@Valid @RequestBody GradProgram gradProgram) { 
-    	logger.debug("updateGradPrograms : ");
+    	logger.info("updateGradProgramsss : ");
     	validation.requiredField(gradProgram.getProgramCode(), "Program Code");
     	validation.requiredField(gradProgram.getProgramType(), "Program Type");
     	validation.requiredField(gradProgram.getProgramName(), "Program Name");
@@ -92,7 +93,7 @@ public class ProgramManagementController {
     	}
     	OAuth2AuthenticationDetails auth = (OAuth2AuthenticationDetails) SecurityContextHolder.getContext().getAuthentication().getDetails(); 
     	String accessToken = auth.getTokenValue();
-        return response.UPDATED(programManagementService.updateGradProgram(gradProgram,accessToken),GradProgram.class);
+        return response.UPDATED(programManagementService.updateGradProgram(gradProgram,accessToken));
     }
     
     @DeleteMapping(EducGradProgramManagementApiConstants.DELETE_PROGRAM_MAPPING)
@@ -112,6 +113,46 @@ public class ProgramManagementController {
     public GradProgramSets getAllPrograms(@PathVariable String programCode) {
     	logger.debug("get All Program Sets : ");
         return programManagementService.getAllProgramSetList(programCode);
+    }
+    
+    @PostMapping(EducGradProgramManagementApiConstants.GRAD_PROGRAM_SETS)
+    @PreAuthorize(PermissionsContants.CREATE_GRAD_PROGRAM_SET)
+    public ResponseEntity<ApiResponseModel<GradProgramSet>> createGradProgramSets(@Valid @RequestBody GradProgramSet gradProgramSet) { 
+    	logger.debug("createGradProgramSets : ");
+    	validation.requiredField(gradProgramSet.getGradProgramCode(), "Program Code");
+    	validation.requiredField(gradProgramSet.getProgramSet(), "Program Set");
+    	validation.requiredField(gradProgramSet.getProgramSetStartDate(), "Program Set Start Date");
+    	validation.requiredField(gradProgramSet.getProgramSetName(), "Program Set Name");
+    	if(validation.hasErrors()) {
+    		validation.stopOnErrors();
+    		return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+    	}
+    	return response.CREATED(programManagementService.createGradProgramSet(gradProgramSet));
+    }
+    
+    @PutMapping(EducGradProgramManagementApiConstants.GRAD_PROGRAM_SETS)
+    @PreAuthorize(PermissionsContants.UPDATE_GRAD_PROGRAM_SET)
+    public ResponseEntity<ApiResponseModel<GradProgramSet>> updateGradProgramSets(@Valid @RequestBody GradProgramSet gradProgramSet) { 
+    	logger.info("updateGradProgramSets : ");
+    	validation.requiredField(gradProgramSet.getGradProgramCode(), "Program Code");
+    	validation.requiredField(gradProgramSet.getProgramSet(), "Program Set");
+    	validation.requiredField(gradProgramSet.getProgramSetStartDate(), "Program Set Start Date");
+    	validation.requiredField(gradProgramSet.getProgramSetName(), "Program Set Name");
+    	if(validation.hasErrors()) {
+    		validation.stopOnErrors();
+    		return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+    	}
+    	return response.UPDATED(programManagementService.updateGradProgramSet(gradProgramSet));
+    }
+    
+    @DeleteMapping(EducGradProgramManagementApiConstants.GRAD_PROGRAM_SETS)
+    @PreAuthorize(PermissionsContants.DELETE_GRAD_PROGRAM_SET)
+    public ResponseEntity<Void> deleteGradProgramSet(
+    		@RequestParam(value = "programCode", required = true) String programCode, 
+            @RequestParam(value = "programSet", required = true) String programSet,
+            @RequestParam(value = "programSetID", required = true) String programSetID) { 
+    	logger.debug("deleteGradPrograms : ");    	
+        return response.DELETE(programManagementService.deleteGradProgramSets(UUID.fromString(programSetID),programCode,programSet));
     }
     
     @GetMapping(EducGradProgramManagementApiConstants.GET_ALL_PROGRAM_RULES)

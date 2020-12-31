@@ -127,7 +127,7 @@ public class ResponseHelper {
 		return new ResponseEntity<>(ApiResponseModel.SUCCESS(modelMapper.map(returnValue, type)), HttpStatus.OK);
 	}
 
-	protected <T> ResponseEntity<ApiResponseModel<T>> UPDATED(T returnValue) {
+	public <T> ResponseEntity<ApiResponseModel<T>> UPDATED(T returnValue) {
 		if (returnValue == null) {
 			return new ResponseEntity<>(HttpStatus.NOT_FOUND);
 		}

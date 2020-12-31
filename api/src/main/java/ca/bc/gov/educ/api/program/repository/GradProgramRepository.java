@@ -18,5 +18,8 @@ public interface GradProgramRepository extends JpaRepository<GradProgramEntity, 
 
     @Query(value="select DISTINCT p.* from grad_program_rules c inner join grad_program_set s on s.ID = c.fk_program_set_id inner join grad_program p on p.code = s.fk_grad_program_code where p.code=:programCode",nativeQuery=true)
 	Optional<GradProgramEntity> findIfChildRecordsExists(@Valid String programCode);
+    
+    @Query(value="select p.* from grad_program_set s inner join grad_program p on p.code = s.fk_grad_program_code where p.code=:programCode",nativeQuery=true)
+    Optional<GradProgramEntity> findIfProgramSetExists(@Valid String programCode);
 
 }

@@ -6,6 +6,7 @@ import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
+import javax.transaction.Transactional;
 import javax.validation.Valid;
 
 import org.apache.commons.lang3.StringUtils;
@@ -30,6 +31,7 @@ import ca.bc.gov.educ.api.program.model.dto.GradRequirementTypes;
 import ca.bc.gov.educ.api.program.model.dto.GradRuleDetails;
 import ca.bc.gov.educ.api.program.model.dto.GradSpecialCase;
 import ca.bc.gov.educ.api.program.model.entity.GradProgramEntity;
+import ca.bc.gov.educ.api.program.model.entity.GradProgramSetEntity;
 import ca.bc.gov.educ.api.program.model.transformer.GradLetterGradeTransformer;
 import ca.bc.gov.educ.api.program.model.transformer.GradProgramRulesTransformer;
 import ca.bc.gov.educ.api.program.model.transformer.GradProgramSetTransformer;
@@ -216,6 +218,7 @@ public class ProgramManagementService {
 		}		
 	}
 	
+	@Transactional
 	public GradProgram updateGradProgram(GradProgram gradProgram,String accessToken) {
 		HttpHeaders httpHeaders = EducGradProgramManagementApiUtils.getHeaders(accessToken);
 		Optional<GradProgramEntity> gradProgramOptional = gradProgramRepository.findById(gradProgram.getProgramCode());
@@ -243,12 +246,82 @@ public class ProgramManagementService {
 	}
 
 	public int deleteGradPrograms(@Valid String programCode) {
-		Optional<GradProgramEntity> gradProgramOptional = gradProgramRepository.findIfChildRecordsExists(programCode);
+		Optional<GradProgramEntity> gradProgramOptional = gradProgramRepository.findIfProgramSetExists(programCode);
 		if(gradProgramOptional.isPresent()) {
 			validation.addErrorAndStop(String.format("This Program [%s] cannot be deleted as it has program sets and rules data associated with it.",gradProgramOptional.get().getProgramCode()));
 			return 0;
 		}else {
 			gradProgramRepository.deleteById(programCode);
+			return 1;
+		}		
+	}
+
+	public GradProgramSet createGradProgramSet(@Valid GradProgramSet gradProgramSet) {
+		GradProgramSetEntity toBeSavedObject = gradProgramSetTransformer.transformToEntity(gradProgramSet);
+		UUID existingObjectCheck = gradProgramSetRepository.findIdByGradProgramCodeAndProgramSet(gradProgramSet.getGradProgramCode(),gradProgramSet.getProgramSet());
+		if(existingObjectCheck != null) {
+			validation.addErrorAndStop(String.format("Combination of Program Code [%s] and Program Set [%s] already exists",gradProgramSet.getGradProgramCode(),gradProgramSet.getProgramSet()));
+			return gradProgramSet;			
+		}else {			
+			if(gradProgramRepository.existsById(gradProgramSet.getGradProgramCode()) && gradProgramRepository.existsById(gradProgramSet.getProgramSet())) { 
+    			return gradProgramSetTransformer.transformToDTO(gradProgramSetRepository.save(toBeSavedObject));    			
+    		}else {
+    			validation.addErrorAndStop(String.format("Either Grad Program [%s] or Program Set [%s] is not Valid",gradProgramSet.getGradProgramCode(),gradProgramSet.getProgramSet()));
+    			return gradProgramSet;
+    		}	
+			
+		}
+	}
+
+	public GradProgramSet updateGradProgramSet(@Valid GradProgramSet gradProgramSet) {
+		GradProgramSetEntity sourceObject = gradProgramSetTransformer.transformToEntity(gradProgramSet);
+		Optional<GradProgramSetEntity> gradProgramSetOptional = gradProgramSetRepository.findById(gradProgramSet.getId());
+		if(gradProgramSetOptional.isPresent()) {
+			GradProgramSetEntity gradSetEnity = gradProgramSetOptional.get();	
+			if(checkIfProgramSetandCodeChanged(gradSetEnity,sourceObject)) {
+				BeanUtils.copyProperties(sourceObject,gradSetEnity,"createdBy","createdTimestamp");
+				UUID existingObjectCheck = gradProgramSetRepository.findIdByGradProgramCodeAndProgramSet(gradSetEnity.getGradProgramCode(),gradSetEnity.getProgramSet());
+				if(existingObjectCheck != null) {
+					validation.addErrorAndStop(String.format("Combination of Program Code [%s] and Program Set [%s] already exists",gradProgramSet.getGradProgramCode(),gradProgramSet.getProgramSet()));
+					return gradProgramSet;			
+				}else {			
+					if(gradProgramRepository.existsById(gradProgramSet.getGradProgramCode()) && gradProgramRepository.existsById(gradProgramSet.getProgramSet())) { 
+		    			return gradProgramSetTransformer.transformToDTO(gradProgramSetRepository.save(gradSetEnity));    			
+		    		}else {
+		    			validation.addErrorAndStop(String.format("Either Grad Program [%s] or Program Set [%s] is not Valid",gradProgramSet.getGradProgramCode(),gradProgramSet.getProgramSet()));
+		    			return gradProgramSet;
+		    		}				
+				}
+			}else {
+				if(gradProgramRepository.existsById(gradProgramSet.getGradProgramCode()) && gradProgramRepository.existsById(gradProgramSet.getProgramSet())) { 
+					BeanUtils.copyProperties(sourceObject,gradSetEnity,"createdBy","createdTimestamp");
+					return gradProgramSetTransformer.transformToDTO(gradProgramSetRepository.save(gradSetEnity));    			
+	    		}else {
+	    			validation.addErrorAndStop(String.format("Either Grad Program [%s] or Program Set [%s] is not Valid",gradProgramSet.getGradProgramCode(),gradProgramSet.getProgramSet()));
+	    			return gradProgramSet;
+	    		}
+			}
+		}else {
+			validation.addErrorAndStop("Unique Identifier not found. Update Failed");
+			return gradProgramSet;
+		}
+	}
+	
+	private boolean checkIfProgramSetandCodeChanged(GradProgramSetEntity gradSetEnity, GradProgramSetEntity sourceObject) {
+		if(!sourceObject.getProgramSet().equals(gradSetEnity.getProgramSet()) || !sourceObject.getGradProgramCode().equals(gradSetEnity.getGradProgramCode())) {
+			return true;
+		}
+		return false;
+		
+	}
+
+	public int deleteGradProgramSets(UUID programSetID, @Valid String programCode,@Valid String programSet) {
+		Optional<GradProgramSetEntity> gradProgramSetOptional = gradProgramSetRepository.findIfProgramRulesExists(programCode, programSet);
+		if(gradProgramSetOptional.isPresent()) {
+			validation.addErrorAndStop(String.format("This Program Set [%s] cannot be deleted as it has rules data associated with it.",gradProgramSetOptional.get().getProgramSet()));
+			return 0;
+		}else {
+			gradProgramSetRepository.deleteById(programSetID);
 			return 1;
 		}		
 	}
