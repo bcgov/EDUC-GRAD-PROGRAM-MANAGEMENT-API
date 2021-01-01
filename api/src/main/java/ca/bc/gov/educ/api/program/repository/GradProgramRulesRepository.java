@@ -24,4 +24,7 @@ public interface GradProgramRulesRepository extends JpaRepository<GradProgramRul
 
     Optional<GradProgramRulesEntity> findByRuleCode(String ruleCode);
 
+    @Query("select c.id from GradProgramRulesEntity c where c.ruleCode=:ruleCode")
+	UUID findIdByRuleCode(String ruleCode);
+
 }

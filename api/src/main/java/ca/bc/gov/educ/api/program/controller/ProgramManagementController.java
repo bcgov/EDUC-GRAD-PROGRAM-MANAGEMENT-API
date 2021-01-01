@@ -167,6 +167,47 @@ public class ProgramManagementController {
         return programManagementService.getAllProgramRuleList(programCode,programSet,requirementType,accessToken);
     }
     
+    @PostMapping(EducGradProgramManagementApiConstants.GET_ALL_PROGRAM_RULES)
+    @PreAuthorize(PermissionsContants.CREATE_GRAD_PROGRAM_RULES)
+    public ResponseEntity<ApiResponseModel<GradProgramRule>> createGradProgramRules(@Valid @RequestBody GradProgramRule gradProgramRule) { 
+    	logger.debug("createGradProgramRules : ");
+    	validation.requiredField(gradProgramRule.getProgramSetID(), "Program Set");
+    	validation.requiredField(gradProgramRule.getRequirementType(), "Requirement Type");
+    	validation.requiredField(gradProgramRule.getRuleCode(), "Rule Code");
+    	validation.requiredField(gradProgramRule.getRequirementName(), "Requirement Name");
+    	if(validation.hasErrors()) {
+    		validation.stopOnErrors();
+    		return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+    	}
+    	OAuth2AuthenticationDetails auth = (OAuth2AuthenticationDetails) SecurityContextHolder.getContext().getAuthentication().getDetails(); 
+    	String accessToken = auth.getTokenValue();
+    	return response.CREATED(programManagementService.createGradProgramRules(gradProgramRule,accessToken));
+    }
+    
+    @PutMapping(EducGradProgramManagementApiConstants.GET_ALL_PROGRAM_RULES)
+    @PreAuthorize(PermissionsContants.UPDATE_GRAD_PROGRAM_RULES)
+    public ResponseEntity<ApiResponseModel<GradProgramRule>> updateGradProgramRules(@Valid @RequestBody GradProgramRule gradProgramRule) { 
+    	logger.debug("updateGradProgramRules : ");
+    	validation.requiredField(gradProgramRule.getProgramSetID(), "Program Set");
+    	validation.requiredField(gradProgramRule.getRequirementType(), "Requirement Type");
+    	validation.requiredField(gradProgramRule.getRuleCode(), "Rule Code");
+    	validation.requiredField(gradProgramRule.getRequirementName(), "Requirement Name");
+    	if(validation.hasErrors()) {
+    		validation.stopOnErrors();
+    		return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+    	}
+    	OAuth2AuthenticationDetails auth = (OAuth2AuthenticationDetails) SecurityContextHolder.getContext().getAuthentication().getDetails(); 
+    	String accessToken = auth.getTokenValue();
+    	return response.UPDATED(programManagementService.updateGradProgramRules(gradProgramRule,accessToken));
+    }
+    
+    @DeleteMapping(EducGradProgramManagementApiConstants.DELETE_PROGRAM_RULES_MAPPING)
+    @PreAuthorize(PermissionsContants.DELETE_GRAD_PROGRAM_RULES)
+    public ResponseEntity<Void> deleteGradProgramRules(@PathVariable(value = "programRuleID", required = true) String programRuleID) { 
+    	logger.debug("deleteGradProgramRules : ");    	
+        return response.DELETE(programManagementService.deleteGradProgramRules(UUID.fromString(programRuleID)));
+    }
+    
     @GetMapping(EducGradProgramManagementApiConstants.GET_ALL_SPECIAL_CASE_MAPPING)
     @PreAuthorize(PermissionsContants.READ_GRAD_SPECIAL_CASE)
     public List<GradSpecialCase> getAllSpecialCases() { 

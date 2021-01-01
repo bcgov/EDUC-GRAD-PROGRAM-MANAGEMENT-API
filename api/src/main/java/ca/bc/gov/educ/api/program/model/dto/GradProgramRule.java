@@ -1,6 +1,5 @@
 package ca.bc.gov.educ.api.program.model.dto;
 
-import java.sql.Date;
 import java.util.UUID;
 
 import org.springframework.stereotype.Component;
@@ -25,7 +24,7 @@ public class GradProgramRule extends BaseModel {
 	private String requirementDesc;
 	private String isActive;
 	private UUID programSetID;
-	private Date activeDate;
+	private String activeDate;
 	
 	@Override
 	public String toString() {
