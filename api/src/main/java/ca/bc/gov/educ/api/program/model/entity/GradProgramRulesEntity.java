@@ -5,20 +5,27 @@ import java.util.UUID;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
+import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
 import javax.persistence.Table;
 
-import org.hibernate.annotations.Immutable;
+import org.hibernate.annotations.GenericGenerator;
 
 import lombok.Data;
+import lombok.EqualsAndHashCode;
 
 @Data
-@Immutable
 @Entity
 @Table(name = "GRAD_PROGRAM_RULES")
-public class GradProgramRulesEntity {
+@EqualsAndHashCode(callSuper=false)
+public class GradProgramRulesEntity  extends BaseEntity {
    
 	@Id
+	@GeneratedValue(generator = "UUID")
+	@GenericGenerator(
+		name = "UUID",
+		strategy = "org.hibernate.id.UUIDGenerator"
+	)
 	@Column(name = "ID", nullable = false)
     private UUID id; 
 	
@@ -28,7 +35,7 @@ public class GradProgramRulesEntity {
 	@Column(name = "REQUIREMENT_NAME", nullable = true)
     private String requirementName;
 	
-	@Column(name = "REQUIREMENT_TYPE", nullable = true)
+	@Column(name = "FK_GRAD_REQUIREMENT_TYPE_CODE", nullable = true)
     private String requirementType;
 	
 	@Column(name = "REQUIRED_CREDITS", nullable = true)
@@ -54,16 +61,4 @@ public class GradProgramRulesEntity {
 	
 	@Column(name = "ACTIVE_DT", nullable = true)
     private Date activeDate;
-	
-	@Column(name = "CREATED_BY", nullable = true)
-    private String createdBy;
-	
-	@Column(name = "CREATED_TIMESTAMP", nullable = true)
-    private Date createdTimestamp;
-	
-	@Column(name = "UPDATED_BY", nullable = true)
-    private String updatedBy;
-	
-	@Column(name = "UPDATED_TIMESTAMP", nullable = true)
-    private Date updatedTimestamp;	
 }

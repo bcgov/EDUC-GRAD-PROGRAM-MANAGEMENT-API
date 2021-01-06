@@ -3,14 +3,36 @@ package ca.bc.gov.educ.api.program.service;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 import java.util.UUID;
 
-import ca.bc.gov.educ.api.program.model.dto.*;
+import javax.transaction.Transactional;
+import javax.validation.Valid;
+
+import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.http.HttpEntity;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpMethod;
 import org.springframework.stereotype.Service;
+import org.springframework.web.client.RestTemplate;
 
+import ca.bc.gov.educ.api.program.model.dto.GradLetterGrade;
+import ca.bc.gov.educ.api.program.model.dto.GradProgram;
+import ca.bc.gov.educ.api.program.model.dto.GradProgramRule;
+import ca.bc.gov.educ.api.program.model.dto.GradProgramSet;
+import ca.bc.gov.educ.api.program.model.dto.GradProgramSets;
+import ca.bc.gov.educ.api.program.model.dto.GradProgramTypes;
+import ca.bc.gov.educ.api.program.model.dto.GradRequirementTypes;
+import ca.bc.gov.educ.api.program.model.dto.GradRuleDetails;
+import ca.bc.gov.educ.api.program.model.dto.GradSpecialCase;
+import ca.bc.gov.educ.api.program.model.entity.GradProgramEntity;
+import ca.bc.gov.educ.api.program.model.entity.GradProgramRulesEntity;
+import ca.bc.gov.educ.api.program.model.entity.GradProgramSetEntity;
 import ca.bc.gov.educ.api.program.model.transformer.GradLetterGradeTransformer;
 import ca.bc.gov.educ.api.program.model.transformer.GradProgramRulesTransformer;
 import ca.bc.gov.educ.api.program.model.transformer.GradProgramSetTransformer;
@@ -21,6 +43,10 @@ import ca.bc.gov.educ.api.program.repository.GradProgramRepository;
 import ca.bc.gov.educ.api.program.repository.GradProgramRulesRepository;
 import ca.bc.gov.educ.api.program.repository.GradProgramSetRepository;
 import ca.bc.gov.educ.api.program.repository.GradSpecialCaseRepository;
+import ca.bc.gov.educ.api.program.util.EducGradProgramManagementApiConstants;
+import ca.bc.gov.educ.api.program.util.EducGradProgramManagementApiUtils;
+import ca.bc.gov.educ.api.program.util.GradBusinessRuleException;
+import ca.bc.gov.educ.api.program.util.GradValidation;
 
 @Service
 public class ProgramManagementService {
@@ -54,6 +80,18 @@ public class ProgramManagementService {
     
     @Autowired
     private GradLetterGradeRepository gradLetterGradeRepository; 
+    
+    @Autowired
+	GradValidation validation;
+    
+    @Value(EducGradProgramManagementApiConstants.ENDPOINT_PROGRAM_TYPE_BY_CODE_URL)
+    private String getProgramTypeByCodeURL;
+    
+    @Value(EducGradProgramManagementApiConstants.ENDPOINT_REQUIREMENT_TYPE_BY_CODE_URL)
+    private String getRequirementTypeByCodeURL;    
+    
+    @Autowired
+    RestTemplate restTemplate;
 
     private static Logger logger = LoggerFactory.getLogger(ProgramManagementService.class);
 
@@ -89,13 +127,24 @@ public class ProgramManagementService {
         return gradProgramSets;
 	}
 
-	public List<GradProgramRule> getAllProgramRuleList(String programCode, String programSet, String requirementType) {
+	public List<GradProgramRule> getAllProgramRuleList(String programCode, String programSet, String requirementType,String accessToken) {
 		UUID programSetID = gradProgramSetRepository.findIdByGradProgramCodeAndProgramSet(programCode,programSet);
+		HttpHeaders httpHeaders = EducGradProgramManagementApiUtils.getHeaders(accessToken);
 		List<GradProgramRule> programRuleList  = new ArrayList<GradProgramRule>();
         try {
-        	programRuleList = gradProgramRulesTransformer.transformToDTO(gradProgramRulesRepository.findByProgramSetIDAndRequirementType(programSetID,requirementType));            
+        	if(StringUtils.isNotBlank(requirementType)) {
+        	restTemplate.exchange(String.format(getRequirementTypeByCodeURL,requirementType), HttpMethod.GET,
+    				new HttpEntity<>(httpHeaders), GradRequirementTypes.class).getBody();
+        	}
+        	programRuleList = gradProgramRulesTransformer.transformToDTO(gradProgramRulesRepository.findByProgramSetIDAndRequirementType(programSetID,requirementType));   
+        	programRuleList.forEach(pR-> {
+        		GradRequirementTypes reqType = restTemplate.exchange(String.format(getRequirementTypeByCodeURL,pR.getRequirementType()), HttpMethod.GET,
+        				new HttpEntity<>(httpHeaders), GradRequirementTypes.class).getBody();
+        		pR.setRequirementTypeDesc(reqType.getDescription());
+        	});
         } catch (Exception e) {
             logger.debug("Exception:" + e);
+            validation.addErrorAndStop(String.format("Requirement Type [%s] is not Valid",requirementType));
         }
         return programRuleList;
 	}
@@ -143,5 +192,222 @@ public class ProgramManagementService {
 
 	public GradLetterGrade getSpecificLetterGrade(String letterGrade) {
 		return gradLetterGradeTransformer.transformToDTO(gradLetterGradeRepository.findById(letterGrade));
+	}
+
+	public GradProgram createGradProgram(GradProgram gradProgram,String accessToken) {
+		HttpHeaders httpHeaders = EducGradProgramManagementApiUtils.getHeaders(accessToken);
+		GradProgramEntity toBeSavedObject = gradProgramTransformer.transformToEntity(gradProgram);
+		Optional<GradProgramEntity> existingObjectCheck = gradProgramRepository.findById(gradProgram.getProgramCode());
+		if(existingObjectCheck.isPresent()) {
+			validation.addErrorAndStop(String.format("Program Code [%s] already exists",gradProgram.getProgramCode()));
+			return gradProgram;
+			
+		}else {
+			try {
+			GradProgramTypes programTypes = restTemplate.exchange(String.format(getProgramTypeByCodeURL,gradProgram.getProgramType()), HttpMethod.GET,
+    				new HttpEntity<>(httpHeaders), GradProgramTypes.class).getBody();
+    		if(programTypes != null) { 
+    			return gradProgramTransformer.transformToDTO(gradProgramRepository.save(toBeSavedObject));    			
+    		}else {
+    			validation.addErrorAndStop(String.format("Program Type [%s] is not Valid",gradProgram.getProgramType()));
+    			return gradProgram;
+    		}	
+			}catch(Exception c) {
+				validation.addErrorAndStop(String.format("Program Type [%s] is not Valid",gradProgram.getProgramType()));
+				throw new GradBusinessRuleException();
+			}
+		}		
+	}
+	
+	@Transactional
+	public GradProgram updateGradProgram(GradProgram gradProgram,String accessToken) {
+		HttpHeaders httpHeaders = EducGradProgramManagementApiUtils.getHeaders(accessToken);
+		Optional<GradProgramEntity> gradProgramOptional = gradProgramRepository.findById(gradProgram.getProgramCode());
+		GradProgramEntity sourceObject = gradProgramTransformer.transformToEntity(gradProgram);
+		if(gradProgramOptional.isPresent()) {
+			try {
+				GradProgramEntity gradEnity = gradProgramOptional.get();			
+				BeanUtils.copyProperties(sourceObject,gradEnity,"createdBy","createdTimestamp");
+				GradProgramTypes programTypes = restTemplate.exchange(String.format(getProgramTypeByCodeURL,gradProgram.getProgramType()), HttpMethod.GET,
+	    				new HttpEntity<>(httpHeaders), GradProgramTypes.class).getBody();
+	    		if(programTypes != null) {
+	    			return gradProgramTransformer.transformToDTO(gradProgramRepository.save(gradEnity));
+	    		}else {
+	    			validation.addErrorAndStop(String.format("Program Type [%s] is not Valid",gradProgram.getProgramType()));
+	    			return gradProgram;
+	    		}
+			}catch(Exception c) {
+				validation.addErrorAndStop(String.format("Program Type [%s] is not Valid",gradProgram.getProgramType()));
+				throw new GradBusinessRuleException();
+			}
+		}else {
+			validation.addErrorAndStop(String.format("Program Code [%s] does not exists",gradProgram.getProgramCode()));
+			return gradProgram;
+		}
+	}
+
+	public int deleteGradPrograms(@Valid String programCode) {
+		Optional<GradProgramEntity> gradProgramOptional = gradProgramRepository.findIfProgramSetExists(programCode);
+		if(gradProgramOptional.isPresent()) {
+			validation.addErrorAndStop(String.format("This Program [%s] cannot be deleted as it has program sets and rules data associated with it.",gradProgramOptional.get().getProgramCode()));
+			return 0;
+		}else {
+			gradProgramRepository.deleteById(programCode);
+			return 1;
+		}		
+	}
+
+	public GradProgramSet createGradProgramSet(@Valid GradProgramSet gradProgramSet) {
+		GradProgramSetEntity toBeSavedObject = gradProgramSetTransformer.transformToEntity(gradProgramSet);
+		UUID existingObjectCheck = gradProgramSetRepository.findIdByGradProgramCodeAndProgramSet(gradProgramSet.getGradProgramCode(),gradProgramSet.getProgramSet());
+		if(existingObjectCheck != null) {
+			validation.addErrorAndStop(String.format("Combination of Program Code [%s] and Program Set [%s] already exists",gradProgramSet.getGradProgramCode(),gradProgramSet.getProgramSet()));
+			return gradProgramSet;			
+		}else {			
+			if(gradProgramRepository.existsById(gradProgramSet.getGradProgramCode()) && gradProgramRepository.existsById(gradProgramSet.getProgramSet())) { 
+    			return gradProgramSetTransformer.transformToDTO(gradProgramSetRepository.save(toBeSavedObject));    			
+    		}else {
+    			validation.addErrorAndStop(String.format("Either Grad Program [%s] or Program Set [%s] is not Valid",gradProgramSet.getGradProgramCode(),gradProgramSet.getProgramSet()));
+    			return gradProgramSet;
+    		}	
+			
+		}
+	}
+
+	public GradProgramSet updateGradProgramSet(@Valid GradProgramSet gradProgramSet) {
+		GradProgramSetEntity sourceObject = gradProgramSetTransformer.transformToEntity(gradProgramSet);
+		Optional<GradProgramSetEntity> gradProgramSetOptional = gradProgramSetRepository.findById(gradProgramSet.getId());
+		if(gradProgramSetOptional.isPresent()) {
+			GradProgramSetEntity gradSetEnity = gradProgramSetOptional.get();	
+			if(checkIfProgramSetandCodeChanged(gradSetEnity,sourceObject)) {
+				BeanUtils.copyProperties(sourceObject,gradSetEnity,"createdBy","createdTimestamp");
+				UUID existingObjectCheck = gradProgramSetRepository.findIdByGradProgramCodeAndProgramSet(gradSetEnity.getGradProgramCode(),gradSetEnity.getProgramSet());
+				if(existingObjectCheck != null) {
+					validation.addErrorAndStop(String.format("Combination of Program Code [%s] and Program Set [%s] already exists",gradProgramSet.getGradProgramCode(),gradProgramSet.getProgramSet()));
+					return gradProgramSet;			
+				}else {			
+					if(gradProgramRepository.existsById(gradProgramSet.getGradProgramCode()) && gradProgramRepository.existsById(gradProgramSet.getProgramSet())) { 
+		    			return gradProgramSetTransformer.transformToDTO(gradProgramSetRepository.save(gradSetEnity));    			
+		    		}else {
+		    			validation.addErrorAndStop(String.format("Either Grad Program [%s] or Program Set [%s] is not Valid",gradProgramSet.getGradProgramCode(),gradProgramSet.getProgramSet()));
+		    			return gradProgramSet;
+		    		}				
+				}
+			}else {
+				if(gradProgramRepository.existsById(gradProgramSet.getGradProgramCode()) && gradProgramRepository.existsById(gradProgramSet.getProgramSet())) { 
+					BeanUtils.copyProperties(sourceObject,gradSetEnity,"createdBy","createdTimestamp");
+					return gradProgramSetTransformer.transformToDTO(gradProgramSetRepository.save(gradSetEnity));    			
+	    		}else {
+	    			validation.addErrorAndStop(String.format("Either Grad Program [%s] or Program Set [%s] is not Valid",gradProgramSet.getGradProgramCode(),gradProgramSet.getProgramSet()));
+	    			return gradProgramSet;
+	    		}
+			}
+		}else {
+			validation.addErrorAndStop("Unique Identifier not found. Update Failed");
+			return gradProgramSet;
+		}
+	}
+	
+	private boolean checkIfProgramSetandCodeChanged(GradProgramSetEntity gradSetEnity, GradProgramSetEntity sourceObject) {
+		if(!sourceObject.getProgramSet().equals(gradSetEnity.getProgramSet()) || !sourceObject.getGradProgramCode().equals(gradSetEnity.getGradProgramCode())) {
+			return true;
+		}
+		return false;
+		
+	}
+
+	public int deleteGradProgramSets(UUID programSetID, @Valid String programCode,@Valid String programSet) {
+		Optional<GradProgramSetEntity> gradProgramSetOptional = gradProgramSetRepository.findIfProgramRulesExists(programCode, programSet);
+		if(gradProgramSetOptional.isPresent()) {
+			validation.addErrorAndStop(String.format("This Program Set [%s] cannot be deleted as it has rules data associated with it.",gradProgramSetOptional.get().getProgramSet()));
+			return 0;
+		}else {
+			gradProgramSetRepository.deleteById(programSetID);
+			return 1;
+		}		
+	}
+
+	public GradProgramRule createGradProgramRules(@Valid GradProgramRule gradProgramRule,String accessToken) {
+		GradProgramRulesEntity toBeSavedObject = gradProgramRulesTransformer.transformToEntity(gradProgramRule);
+		HttpHeaders httpHeaders = EducGradProgramManagementApiUtils.getHeaders(accessToken);
+		UUID existingObjectCheck = gradProgramRulesRepository.findIdByRuleCode(gradProgramRule.getRuleCode());
+		if(existingObjectCheck != null) {
+			validation.addErrorAndStop(String.format("This Rule Code [%s] is already associated to a program set",gradProgramRule.getRuleCode()));
+			return gradProgramRule;			
+		}else {	
+			try {
+				restTemplate.exchange(String.format(getRequirementTypeByCodeURL,gradProgramRule.getRequirementType()), HttpMethod.GET,
+	    				new HttpEntity<>(httpHeaders), GradRequirementTypes.class).getBody();
+				return gradProgramRulesTransformer.transformToDTO(gradProgramRulesRepository.save(toBeSavedObject));
+				
+			}catch(Exception e) {
+				 logger.debug("Exception:" + e);
+		         validation.addErrorAndStop(String.format("Requirement Type [%s] is not Valid",gradProgramRule.getRequirementType()));
+		         throw new GradBusinessRuleException();
+			}
+			
+		}
+	}
+
+	public GradProgramRule updateGradProgramRules(@Valid GradProgramRule gradProgramRule, String accessToken) {
+		GradProgramRulesEntity sourceObject = gradProgramRulesTransformer.transformToEntity(gradProgramRule);
+		HttpHeaders httpHeaders = EducGradProgramManagementApiUtils.getHeaders(accessToken);
+		Optional<GradProgramRulesEntity> gradProgramRulesOptional = gradProgramRulesRepository.findById(gradProgramRule.getId());
+		if(gradProgramRulesOptional.isPresent()) {
+			GradProgramRulesEntity gradRuleEnity = gradProgramRulesOptional.get();	
+			if(checkIfRuleCodeChanged(gradRuleEnity,sourceObject)) {
+				BeanUtils.copyProperties(sourceObject,gradRuleEnity,"createdBy","createdTimestamp");
+				UUID existingObjectCheck = gradProgramRulesRepository.findIdByRuleCode(gradRuleEnity.getRuleCode());
+				if(existingObjectCheck != null) {
+					validation.addErrorAndStop(String.format("This Rule Code [%s] is already associated to a program set",gradProgramRule.getRuleCode()));
+					return gradProgramRule;			
+				}else {	
+					try {
+						restTemplate.exchange(String.format(getRequirementTypeByCodeURL,gradProgramRule.getRequirementType()), HttpMethod.GET,
+			    				new HttpEntity<>(httpHeaders), GradRequirementTypes.class).getBody();
+						return gradProgramRulesTransformer.transformToDTO(gradProgramRulesRepository.save(gradRuleEnity));
+						
+					}catch(Exception e) {
+						 logger.debug("Exception:" + e);
+				         validation.addErrorAndStop(String.format("Requirement Type [%s] is not Valid",gradProgramRule.getRequirementType()));
+				         throw new GradBusinessRuleException();
+					}
+					
+				}
+			}else {
+				try {
+					BeanUtils.copyProperties(sourceObject,gradRuleEnity,"createdBy","createdTimestamp");
+					restTemplate.exchange(String.format(getRequirementTypeByCodeURL,gradProgramRule.getRequirementType()), HttpMethod.GET,
+		    				new HttpEntity<>(httpHeaders), GradRequirementTypes.class).getBody();
+					return gradProgramRulesTransformer.transformToDTO(gradProgramRulesRepository.save(gradRuleEnity));
+					
+				}catch(Exception e) {
+					 logger.debug("Exception:" + e);
+			         validation.addErrorAndStop(String.format("Requirement Type [%s] is not Valid",gradProgramRule.getRequirementType()));
+			         throw new GradBusinessRuleException();
+				}
+			}
+		}else {
+			validation.addErrorAndStop("Unique Identifier not found. Update Failed");
+			return gradProgramRule;
+		}
+	}
+	
+	private boolean checkIfRuleCodeChanged(GradProgramRulesEntity gradRuleEnity, GradProgramRulesEntity sourceObject) {
+		if(!sourceObject.getRuleCode().equals(gradRuleEnity.getRuleCode())) {
+			return true;
+		}
+		return false;		
+	}
+
+	public int deleteGradProgramRules(UUID programRuleID) {
+		Optional<GradProgramRulesEntity> gradProgramRuleOptional = gradProgramRulesRepository.findById(programRuleID);
+		if(gradProgramRuleOptional.isPresent()) {
+			gradProgramRulesRepository.deleteById(programRuleID);
+			return 1;
+		}else {
+			validation.addErrorAndStop("This Program Rule does not exists.");
+			return 0;			
+		}
 	}
 }
