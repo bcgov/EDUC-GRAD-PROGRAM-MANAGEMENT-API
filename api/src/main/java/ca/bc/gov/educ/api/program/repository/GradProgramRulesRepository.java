@@ -8,6 +8,7 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;
 
+import ca.bc.gov.educ.api.program.model.entity.GradProgramEntity;
 import ca.bc.gov.educ.api.program.model.entity.GradProgramRulesEntity;
 
 @Repository
@@ -26,5 +27,8 @@ public interface GradProgramRulesRepository extends JpaRepository<GradProgramRul
 
     @Query("select c.id from GradProgramRulesEntity c where c.ruleCode=:ruleCode")
 	UUID findIdByRuleCode(String ruleCode);
+
+    @Query("select c from GradProgramRulesEntity c where c.requirementType=:typeCode")
+	List<GradProgramRulesEntity> existsByRequirementTypeCode(String typeCode);
 
 }

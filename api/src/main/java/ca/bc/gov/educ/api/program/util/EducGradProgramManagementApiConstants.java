@@ -16,6 +16,8 @@ public class EducGradProgramManagementApiConstants {
 
     //Attribute Constants
     public static final String GET_ALL_PROGRAM_SETS_BY_PROGRAM_CODE = "/programsets/{programCode}";
+    public static final String GET_PROGRAM_BY_PROGRAM_TYPE = "/programtype/{typeCode}";
+    public static final String GET_REQUIREMENT_BY_REQUIREMENT_TYPE = "/requirementtype/{typeCode}";
     public static final String GRAD_PROGRAM_SETS = "/programsets";
     public static final String GET_ALL_PROGRAM_RULES = "/programrules";
     public static final String GET_ALL_SPECIAL_CASE__BY_SPECIAL_CODE = "/specialcase/{specialCode}";
