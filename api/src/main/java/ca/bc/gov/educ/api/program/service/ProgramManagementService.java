@@ -410,4 +410,22 @@ public class ProgramManagementService {
 			return 0;			
 		}
 	}
+
+	public Boolean getProgramByProgramType(String typeCode) {
+		List<GradProgramEntity> gradList = gradProgramRepository.existsByProgramTypeCode(typeCode);
+		if(gradList.size() > 0) {
+			return true;
+		}else {
+			return false;
+		}
+	}
+
+	public Boolean getRequirementByRequirementType(String typeCode) {
+		List<GradProgramRulesEntity> gradList = gradProgramRulesRepository.existsByRequirementTypeCode(typeCode);
+		if(gradList.size() > 0) {
+			return true;
+		}else {
+			return false;
+		}
+	}
 }

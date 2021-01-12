@@ -244,4 +244,18 @@ public class ProgramManagementController {
     	logger.debug("getSpecificLetterGrade : ");
         return programManagementService.getSpecificLetterGrade(letterGrade);
     }
+    
+    @GetMapping(EducGradProgramManagementApiConstants.GET_PROGRAM_BY_PROGRAM_TYPE)
+    @PreAuthorize(PermissionsContants.READ_GRAD_PROGRAM)
+    public Boolean getProgramByProgramType(@PathVariable String typeCode) { 
+    	logger.debug("getProgramByProgramType : ");
+        return programManagementService.getProgramByProgramType(typeCode);
+    }
+    
+    @GetMapping(EducGradProgramManagementApiConstants.GET_REQUIREMENT_BY_REQUIREMENT_TYPE)
+    @PreAuthorize(PermissionsContants.READ_GRAD_PROGRAM_RULES)
+    public Boolean getRequirementByRequirementType(@PathVariable String typeCode) { 
+    	logger.debug("getRequirementByRequirementType : ");
+        return programManagementService.getRequirementByRequirementType(typeCode);
+    }   
 }
