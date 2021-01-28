@@ -12,6 +12,7 @@ public class EducGradProgramManagementApiConstants {
     public static final String GET_ALL_SPECIAL_CASE_MAPPING = "/specialcase";
     public static final String GET_ALL_LETTER_GRADE_MAPPING = "/lettergrade";
     public static final String DELETE_PROGRAM_MAPPING = "/programs/{programCode}";
+    public static final String GET_PROGRAM_MAPPING = "/programs/{programCode}";
     public static final String DELETE_PROGRAM_RULES_MAPPING = "/programrules/{programRuleID}";
 
     //Attribute Constants

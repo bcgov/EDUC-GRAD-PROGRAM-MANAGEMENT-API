@@ -64,6 +64,13 @@ public class ProgramManagementController {
 		}.getType());
     }
     
+    @GetMapping(EducGradProgramManagementApiConstants.GET_PROGRAM_MAPPING)
+    @PreAuthorize(PermissionsContants.READ_GRAD_PROGRAM)
+    public ResponseEntity<GradProgram> getSpecificProgram(@PathVariable String programCode) { 
+    	logger.debug("getSpecificProgram : ");
+        return response.GET(programManagementService.getSpecificProgram(programCode));
+    }
+    
     @PostMapping(EducGradProgramManagementApiConstants.GET_ALL_PROGRAM_MAPPING)
     @PreAuthorize(PermissionsContants.CREATE_GRAD_PROGRAM)
     public ResponseEntity<ApiResponseModel<GradProgram>> createGradPrograms(@Valid @RequestBody GradProgram gradProgram) { 

@@ -428,4 +428,8 @@ public class ProgramManagementService {
 			return false;
 		}
 	}
+
+	public GradProgram getSpecificProgram(String programCode) {
+		return gradProgramTransformer.transformToDTO(gradProgramRepository.findById(programCode));
+	}
 }
