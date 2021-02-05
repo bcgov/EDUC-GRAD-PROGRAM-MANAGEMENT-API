@@ -76,15 +76,12 @@ public class ProgramManagementController {
     public ResponseEntity<ApiResponseModel<GradProgram>> createGradPrograms(@Valid @RequestBody GradProgram gradProgram) { 
     	logger.debug("createGradPrograms : ");
     	validation.requiredField(gradProgram.getProgramCode(), "Program Code");
-    	validation.requiredField(gradProgram.getProgramType(), "Program Type");
-    	validation.requiredField(gradProgram.getProgramName(), "Program Name");
+       	validation.requiredField(gradProgram.getProgramName(), "Program Name");
     	if(validation.hasErrors()) {
     		validation.stopOnErrors();
     		return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
     	}
-    	OAuth2AuthenticationDetails auth = (OAuth2AuthenticationDetails) SecurityContextHolder.getContext().getAuthentication().getDetails(); 
-    	String accessToken = auth.getTokenValue();
-        return response.CREATED(programManagementService.createGradProgram(gradProgram,accessToken));
+        return response.CREATED(programManagementService.createGradProgram(gradProgram));
     }
     
     @PutMapping(EducGradProgramManagementApiConstants.GET_ALL_PROGRAM_MAPPING)
@@ -92,15 +89,12 @@ public class ProgramManagementController {
     public ResponseEntity<ApiResponseModel<GradProgram>> updateGradPrograms(@Valid @RequestBody GradProgram gradProgram) { 
     	logger.info("updateGradProgramsss : ");
     	validation.requiredField(gradProgram.getProgramCode(), "Program Code");
-    	validation.requiredField(gradProgram.getProgramType(), "Program Type");
-    	validation.requiredField(gradProgram.getProgramName(), "Program Name");
+      	validation.requiredField(gradProgram.getProgramName(), "Program Name");
     	if(validation.hasErrors()) {
     		validation.stopOnErrors();
     		return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
     	}
-    	OAuth2AuthenticationDetails auth = (OAuth2AuthenticationDetails) SecurityContextHolder.getContext().getAuthentication().getDetails(); 
-    	String accessToken = auth.getTokenValue();
-        return response.UPDATED(programManagementService.updateGradProgram(gradProgram,accessToken));
+        return response.UPDATED(programManagementService.updateGradProgram(gradProgram));
     }
     
     @DeleteMapping(EducGradProgramManagementApiConstants.DELETE_PROGRAM_MAPPING)
@@ -115,70 +109,23 @@ public class ProgramManagementController {
         return response.DELETE(programManagementService.deleteGradPrograms(programCode));
     }
     
-    @GetMapping(EducGradProgramManagementApiConstants.GET_ALL_PROGRAM_SETS_BY_PROGRAM_CODE)
-    @PreAuthorize(PermissionsContants.READ_GRAD_PROGRAM_SET)
-    public GradProgramSets getAllPrograms(@PathVariable String programCode) {
-    	logger.debug("get All Program Sets : ");
-        return programManagementService.getAllProgramSetList(programCode);
-    }
-    
-    @PostMapping(EducGradProgramManagementApiConstants.GRAD_PROGRAM_SETS)
-    @PreAuthorize(PermissionsContants.CREATE_GRAD_PROGRAM_SET)
-    public ResponseEntity<ApiResponseModel<GradProgramSet>> createGradProgramSets(@Valid @RequestBody GradProgramSet gradProgramSet) { 
-    	logger.debug("createGradProgramSets : ");
-    	validation.requiredField(gradProgramSet.getGradProgramCode(), "Program Code");
-    	validation.requiredField(gradProgramSet.getProgramSet(), "Program Set");
-    	validation.requiredField(gradProgramSet.getProgramSetStartDate(), "Program Set Start Date");
-    	validation.requiredField(gradProgramSet.getProgramSetName(), "Program Set Name");
-    	if(validation.hasErrors()) {
-    		validation.stopOnErrors();
-    		return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
-    	}
-    	return response.CREATED(programManagementService.createGradProgramSet(gradProgramSet));
-    }
-    
-    @PutMapping(EducGradProgramManagementApiConstants.GRAD_PROGRAM_SETS)
-    @PreAuthorize(PermissionsContants.UPDATE_GRAD_PROGRAM_SET)
-    public ResponseEntity<ApiResponseModel<GradProgramSet>> updateGradProgramSets(@Valid @RequestBody GradProgramSet gradProgramSet) { 
-    	logger.info("updateGradProgramSets : ");
-    	validation.requiredField(gradProgramSet.getGradProgramCode(), "Program Code");
-    	validation.requiredField(gradProgramSet.getProgramSet(), "Program Set");
-    	validation.requiredField(gradProgramSet.getProgramSetStartDate(), "Program Set Start Date");
-    	validation.requiredField(gradProgramSet.getProgramSetName(), "Program Set Name");
-    	if(validation.hasErrors()) {
-    		validation.stopOnErrors();
-    		return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
-    	}
-    	return response.UPDATED(programManagementService.updateGradProgramSet(gradProgramSet));
-    }
-    
-    @DeleteMapping(EducGradProgramManagementApiConstants.GRAD_PROGRAM_SETS)
-    @PreAuthorize(PermissionsContants.DELETE_GRAD_PROGRAM_SET)
-    public ResponseEntity<Void> deleteGradProgramSet(
-    		@RequestParam(value = "programCode", required = true) String programCode, 
-            @RequestParam(value = "programSet", required = true) String programSet,
-            @RequestParam(value = "programSetID", required = true) String programSetID) { 
-    	logger.debug("deleteGradPrograms : ");    	
-        return response.DELETE(programManagementService.deleteGradProgramSets(UUID.fromString(programSetID),programCode,programSet));
-    }
     
     @GetMapping(EducGradProgramManagementApiConstants.GET_ALL_PROGRAM_RULES)
     @PreAuthorize(PermissionsContants.READ_GRAD_PROGRAM_RULES)
     public List<GradProgramRule> getAllProgramsRules(
     		@RequestParam(value = "programCode", required = true) String programCode, 
-            @RequestParam(value = "programSet", required = true) String programSet,
             @RequestParam(value = "requirementType", required = false) String requirementType) { 
     	logger.debug("get All Program Rules : ");
     	OAuth2AuthenticationDetails auth = (OAuth2AuthenticationDetails) SecurityContextHolder.getContext().getAuthentication().getDetails(); 
     	String accessToken = auth.getTokenValue();
-        return programManagementService.getAllProgramRuleList(programCode,programSet,requirementType,accessToken);
+        return programManagementService.getAllProgramRuleList(programCode,requirementType,accessToken);
     }
     
     @PostMapping(EducGradProgramManagementApiConstants.GET_ALL_PROGRAM_RULES)
     @PreAuthorize(PermissionsContants.CREATE_GRAD_PROGRAM_RULES)
     public ResponseEntity<ApiResponseModel<GradProgramRule>> createGradProgramRules(@Valid @RequestBody GradProgramRule gradProgramRule) { 
     	logger.debug("createGradProgramRules : ");
-    	validation.requiredField(gradProgramRule.getProgramSetID(), "Program Set");
+    	validation.requiredField(gradProgramRule.getProgramCode(), "Program Code");
     	validation.requiredField(gradProgramRule.getRequirementType(), "Requirement Type");
     	validation.requiredField(gradProgramRule.getRuleCode(), "Rule Code");
     	validation.requiredField(gradProgramRule.getRequirementName(), "Requirement Name");
@@ -195,7 +142,7 @@ public class ProgramManagementController {
     @PreAuthorize(PermissionsContants.UPDATE_GRAD_PROGRAM_RULES)
     public ResponseEntity<ApiResponseModel<GradProgramRule>> updateGradProgramRules(@Valid @RequestBody GradProgramRule gradProgramRule) { 
     	logger.debug("updateGradProgramRules : ");
-    	validation.requiredField(gradProgramRule.getProgramSetID(), "Program Set");
+    	validation.requiredField(gradProgramRule.getProgramCode(), "Program Code");
     	validation.requiredField(gradProgramRule.getRequirementType(), "Requirement Type");
     	validation.requiredField(gradProgramRule.getRuleCode(), "Rule Code");
     	validation.requiredField(gradProgramRule.getRequirementName(), "Requirement Name");
@@ -250,13 +197,6 @@ public class ProgramManagementController {
     public GradLetterGrade getSpecificLetterGrade(@PathVariable String letterGrade) { 
     	logger.debug("getSpecificLetterGrade : ");
         return programManagementService.getSpecificLetterGrade(letterGrade);
-    }
-    
-    @GetMapping(EducGradProgramManagementApiConstants.GET_PROGRAM_BY_PROGRAM_TYPE)
-    @PreAuthorize(PermissionsContants.READ_GRAD_PROGRAM)
-    public Boolean getProgramByProgramType(@PathVariable String typeCode) { 
-    	logger.debug("getProgramByProgramType : ");
-        return programManagementService.getProgramByProgramType(typeCode);
     }
     
     @GetMapping(EducGradProgramManagementApiConstants.GET_REQUIREMENT_BY_REQUIREMENT_TYPE)

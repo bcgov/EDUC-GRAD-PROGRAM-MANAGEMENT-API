@@ -22,34 +22,30 @@ public class GradProgramRulesTransformer {
 
     public GradProgramRule transformToDTO (GradProgramRulesEntity gradProgramEntity) {
     	GradProgramRule gradProgramRule = modelMapper.map(gradProgramEntity, GradProgramRule.class);
-    	gradProgramRule.setActiveDate(EducGradProgramManagementApiUtils.parseTraxDate(gradProgramEntity.getActiveDate() != null ? gradProgramEntity.getActiveDate().toString():null));
         return gradProgramRule;
     }
 
-    public GradProgramRule transformToDTO (Optional<GradProgramRulesEntity> gradProgramSetEntity ) {
+    public GradProgramRule transformToDTO (Optional<GradProgramRulesEntity> gradProgramRuleEntity ) {
     	GradProgramRulesEntity cae = new GradProgramRulesEntity();
-        if (gradProgramSetEntity.isPresent())
-            cae = gradProgramSetEntity.get();
+        if (gradProgramRuleEntity.isPresent())
+            cae = gradProgramRuleEntity.get();
 
         GradProgramRule gradProgramRule = modelMapper.map(cae, GradProgramRule.class);
-        gradProgramRule.setActiveDate(EducGradProgramManagementApiUtils.parseTraxDate(cae.getActiveDate() != null ? cae.getActiveDate().toString():null));
         return gradProgramRule;
     }
 
-	public List<GradProgramRule> transformToDTO (Iterable<GradProgramRulesEntity> gradProgramSetEntities ) {
-		List<GradProgramRule> programSetList = new ArrayList<GradProgramRule>();
-        for (GradProgramRulesEntity gradProgramSetEntity : gradProgramSetEntities) {
-        	GradProgramRule programSet = new GradProgramRule();
-        	programSet = modelMapper.map(gradProgramSetEntity, GradProgramRule.class);
-        	programSet.setActiveDate(EducGradProgramManagementApiUtils.parseTraxDate(programSet.getActiveDate() != null ? programSet.getActiveDate().toString():null));
-        	programSetList.add(programSet);
+	public List<GradProgramRule> transformToDTO (Iterable<GradProgramRulesEntity> gradProgramRuleEntities ) {
+		List<GradProgramRule> programRuleList = new ArrayList<GradProgramRule>();
+        for (GradProgramRulesEntity gradProgramRuleEntity : gradProgramRuleEntities) {
+        	GradProgramRule programRule = new GradProgramRule();
+        	programRule = modelMapper.map(gradProgramRuleEntity, GradProgramRule.class);
+        	programRuleList.add(programRule);
         }
-        return programSetList;
+        return programRuleList;
     }
 
     public GradProgramRulesEntity transformToEntity(GradProgramRule gradProgramRule) {
-        GradProgramRulesEntity gradProgramSetEntity = modelMapper.map(gradProgramRule, GradProgramRulesEntity.class);
-        gradProgramSetEntity.setActiveDate(gradProgramRule.getActiveDate() != null ?Date.valueOf(gradProgramRule.getActiveDate()) : null);
-        return gradProgramSetEntity;
+        GradProgramRulesEntity gradProgramRuleEntity = modelMapper.map(gradProgramRule, GradProgramRulesEntity.class);
+        return gradProgramRuleEntity;
     }
 }
