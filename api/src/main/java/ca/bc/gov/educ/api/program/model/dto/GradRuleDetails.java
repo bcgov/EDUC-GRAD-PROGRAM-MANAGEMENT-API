@@ -12,13 +12,12 @@ public class GradRuleDetails extends BaseModel {
 
 	private String ruleCode; 
 	private String requirementName;
-	private String programCode;
-	private String programSet;
+	private String programCode;	
 	
 	@Override
 	public String toString() {
 		return "GradRuleDetails [ruleCode=" + ruleCode + ", requirementName=" + requirementName + ", programCode="
-				+ programCode + ", programSet=" + programSet + "]";
+				+ programCode + "]";
 	}
 	
 }

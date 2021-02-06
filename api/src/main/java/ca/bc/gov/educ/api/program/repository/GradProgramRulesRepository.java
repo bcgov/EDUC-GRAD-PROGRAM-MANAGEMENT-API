@@ -8,25 +8,24 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;
 
-import ca.bc.gov.educ.api.program.model.entity.GradProgramEntity;
 import ca.bc.gov.educ.api.program.model.entity.GradProgramRulesEntity;
 
 @Repository
 public interface GradProgramRulesRepository extends JpaRepository<GradProgramRulesEntity, UUID> {
 
-    List<GradProgramRulesEntity> findByProgramSetID(UUID programSetID);
+    List<GradProgramRulesEntity> findByProgramCode(String programCode);
 
-    @Query("select c from GradProgramRulesEntity c where c.programSetID=:programSetID and "
+    @Query("select c from GradProgramRulesEntity c where c.programCode=:programCode and "
     + "(:requirementType is null or c.requirementType=:requirementType)")
-	List<GradProgramRulesEntity> findByProgramSetIDAndRequirementType(UUID programSetID, String requirementType);
+	List<GradProgramRulesEntity> findByProgramCodeAndRequirementType(String programCode, String requirementType);
 
     @Override
     List<GradProgramRulesEntity> findAllById(Iterable<UUID> iterable);
 
     Optional<GradProgramRulesEntity> findByRuleCode(String ruleCode);
 
-    @Query("select c.id from GradProgramRulesEntity c where c.ruleCode=:ruleCode")
-	UUID findIdByRuleCode(String ruleCode);
+    @Query("select c.id from GradProgramRulesEntity c where c.ruleCode=:ruleCode and c.programCode=:programCode")
+	UUID findIdByRuleCode(String ruleCode,String programCode);
 
     @Query("select c from GradProgramRulesEntity c where c.requirementType=:typeCode")
 	List<GradProgramRulesEntity> existsByRequirementTypeCode(String typeCode);

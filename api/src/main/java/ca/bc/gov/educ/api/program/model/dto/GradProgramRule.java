@@ -23,17 +23,14 @@ public class GradProgramRule extends BaseModel {
 	private String languageOfInstruction;
 	private String requirementDesc;
 	private String isActive;
-	private UUID programSetID;
-	private String activeDate;
+	private String programCode;
 	
 	@Override
 	public String toString() {
-		return "GradProgramRules [id=" + id + ", ruleCode=" + ruleCode + ", requirementName=" + requirementName
-				+ ", requirementType=" + requirementType + ", requiredCredits=" + requiredCredits + ", notMetDesc="
-				+ notMetDesc + ", requiredLevel=" + requiredLevel + ", languageOfInstruction=" + languageOfInstruction
-				+ ", requirementDesc=" + requirementDesc + ", isActive=" + isActive + ", programSetID=" + programSetID
-				+ "]";
-	}	
-	
-	
+		return "GradProgramRule [id=" + id + ", ruleCode=" + ruleCode + ", requirementName=" + requirementName
+				+ ", requirementType=" + requirementType + ", requirementTypeDesc=" + requirementTypeDesc
+				+ ", requiredCredits=" + requiredCredits + ", notMetDesc=" + notMetDesc + ", requiredLevel="
+				+ requiredLevel + ", languageOfInstruction=" + languageOfInstruction + ", requirementDesc="
+				+ requirementDesc + ", isActive=" + isActive + ", programCode=" + programCode + "]";
+	}
 }
