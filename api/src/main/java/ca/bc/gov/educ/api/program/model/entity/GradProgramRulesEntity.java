@@ -1,6 +1,5 @@
 package ca.bc.gov.educ.api.program.model.entity;
 
-import java.util.Date;
 import java.util.UUID;
 
 import javax.persistence.Column;
@@ -29,7 +28,7 @@ public class GradProgramRulesEntity  extends BaseEntity {
 	@Column(name = "ID", nullable = false)
     private UUID id; 
 	
-	@Column(name = "CODE", nullable = false)
+	@Column(name = "PROGRAM_RULE_CODE", nullable = false)
     private String ruleCode; 
 	
 	@Column(name = "REQUIREMENT_NAME", nullable = true)
@@ -56,9 +55,6 @@ public class GradProgramRulesEntity  extends BaseEntity {
 	@Column(name = "IS_ACTIVE", nullable = true)
     private String isActive;
 	
-	@Column(name = "FK_PROGRAM_SET_ID", nullable = true)
-    private UUID programSetID;
-	
-	@Column(name = "ACTIVE_DT", nullable = true)
-    private Date activeDate;
+	@Column(name = "FK_GRAD_PROGRAM_CODE", nullable = true)
+    private String programCode;
 }

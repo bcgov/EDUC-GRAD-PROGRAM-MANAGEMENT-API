@@ -15,12 +15,10 @@ import lombok.EqualsAndHashCode;
 public class GradProgramEntity extends BaseEntity {
    
 	@Id
-	@Column(name = "CODE", nullable = false)
+	@Column(name = "PROGRAM_CODE", nullable = false)
     private String programCode; 
 	
-	@Column(name = "NAME", nullable = true)
+	@Column(name = "PROGRAM_NAME", nullable = true)
     private String programName; 
 
-	@Column(name = "FK_GRAD_PROGRAM_TYPE_CODE", nullable = true)
-    private String programType;		
 }

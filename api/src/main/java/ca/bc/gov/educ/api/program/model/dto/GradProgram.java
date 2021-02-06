@@ -11,13 +11,11 @@ import lombok.EqualsAndHashCode;
 public class GradProgram extends BaseModel {
 
 	private String programCode; 
-	private String programName; 
-	private String programType;	
+	private String programName;
 	
 	@Override
 	public String toString() {
-		return "GradProgram [programCode=" + programCode + ", programName=" + programName + ", programType="
-				+ programType + "]";
+		return "GradProgram [programCode=" + programCode + ", programName=" + programName + "]";
 	}
 	
 	
