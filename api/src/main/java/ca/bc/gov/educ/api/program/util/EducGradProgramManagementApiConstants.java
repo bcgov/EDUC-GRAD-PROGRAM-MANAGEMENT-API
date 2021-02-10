@@ -9,11 +9,15 @@ public class EducGradProgramManagementApiConstants {
     public static final String API_VERSION = "v1";
     public static final String GRAD_PROGRAM_MANAGEMENT_API_ROOT_MAPPING = "/api/" + API_VERSION + "/programmanagement";
     public static final String GET_ALL_PROGRAM_MAPPING = "/programs";
+    public static final String GET_ALL_SPECIAL_PROGRAM_MAPPING = "/specialprograms";
+    public static final String GET_ALL_SPECIAL_PROGRAM_BY_PROGRAM_CODE_MAPPING = "/specialprograms/{programCode}";
     public static final String GET_ALL_SPECIAL_CASE_MAPPING = "/specialcase";
     public static final String GET_ALL_LETTER_GRADE_MAPPING = "/lettergrade";
     public static final String DELETE_PROGRAM_MAPPING = "/programs/{programCode}";
+    public static final String DELETE_SPECIAL_PROGRAM_MAPPING = "/specialprograms/{specialProgramID}";
     public static final String GET_PROGRAM_MAPPING = "/programs/{programCode}";
     public static final String DELETE_PROGRAM_RULES_MAPPING = "/programrules/{programRuleID}";
+    public static final String DELETE_SPECIAL_PROGRAM_RULES_MAPPING = "/specialprogramrules/{programRuleID}";
 
     //Attribute Constants
     public static final String GET_ALL_PROGRAM_SETS_BY_PROGRAM_CODE = "/programsets/{programCode}";
@@ -21,6 +25,7 @@ public class EducGradProgramManagementApiConstants {
     public static final String GET_REQUIREMENT_BY_REQUIREMENT_TYPE = "/requirementtype/{typeCode}";
     public static final String GRAD_PROGRAM_SETS = "/programsets";
     public static final String GET_ALL_PROGRAM_RULES = "/programrules";
+    public static final String GET_ALL_SPECIAL_PROGRAM_RULES = "/specialprogramrules";
     public static final String GET_ALL_SPECIAL_CASE__BY_SPECIAL_CODE = "/specialcase/{specialCode}";
     public static final String GET_ALL_LETTER_GRADE__BY_LETTER_GRADE = "/lettergrade/{letterGrade}";
     public static final String GET_ALL_SPECIFIC_PROGRAM_RULES_BY_RULE = "/programrules/{ruleCode}";

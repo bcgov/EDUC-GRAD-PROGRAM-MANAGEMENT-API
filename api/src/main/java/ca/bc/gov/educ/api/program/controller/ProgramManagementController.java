@@ -204,5 +204,107 @@ public class ProgramManagementController {
     public Boolean getRequirementByRequirementType(@PathVariable String typeCode) { 
     	logger.debug("getRequirementByRequirementType : ");
         return programManagementService.getRequirementByRequirementType(typeCode);
-    }   
+    }  
+    
+    @GetMapping(EducGradProgramManagementApiConstants.GET_ALL_SPECIAL_PROGRAM_BY_PROGRAM_CODE_MAPPING)
+    @PreAuthorize(PermissionsContants.READ_GRAD_SPECIAL_PROGRAM)
+    public ResponseEntity<List<GradSpecialProgram>> getAllSpecialPrograms(@PathVariable String programCode) { 
+    	logger.debug("getAllSpecialPrograms : ");
+        return response.GET(programManagementService.getAllSpecialProgramList(programCode),new TypeToken<List<GradSpecialProgram>>() {
+		}.getType());
+    }
+    
+    @PostMapping(EducGradProgramManagementApiConstants.GET_ALL_SPECIAL_PROGRAM_MAPPING)
+    @PreAuthorize(PermissionsContants.CREATE_GRAD_SPECIAL_PROGRAM)
+    public ResponseEntity<ApiResponseModel<GradSpecialProgram>> createGradSpecailPrograms(@Valid @RequestBody GradSpecialProgram gradSpecialProgram) { 
+    	logger.debug("createGradPrograms : ");
+    	validation.requiredField(gradSpecialProgram.getProgramCode(), "Program Code");
+       	validation.requiredField(gradSpecialProgram.getSpecialProgramCode(), "Special Program Code");
+       	validation.requiredField(gradSpecialProgram.getSpecialProgramName(), "Special Program Name");
+    	if(validation.hasErrors()) {
+    		validation.stopOnErrors();
+    		return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+    	}
+        return response.CREATED(programManagementService.createGradSpecialProgram(gradSpecialProgram));
+    }
+    
+    @PutMapping(EducGradProgramManagementApiConstants.GET_ALL_SPECIAL_PROGRAM_MAPPING)
+    @PreAuthorize(PermissionsContants.UPDATE_GRAD_SPECIAL_PROGRAM)
+    public ResponseEntity<ApiResponseModel<GradSpecialProgram>> updateGradSpecialPrograms(@Valid @RequestBody GradSpecialProgram gradSpecialProgram) { 
+    	logger.info("updateGradProgramsss : ");
+    	validation.requiredField(gradSpecialProgram.getProgramCode(), "Program Code");
+       	validation.requiredField(gradSpecialProgram.getSpecialProgramCode(), "Special Program Code");
+       	validation.requiredField(gradSpecialProgram.getSpecialProgramName(), "Special Program Name");
+    	if(validation.hasErrors()) {
+    		validation.stopOnErrors();
+    		return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+    	}
+        return response.UPDATED(programManagementService.updateGradSpecialPrograms(gradSpecialProgram));
+    }
+    
+    @DeleteMapping(EducGradProgramManagementApiConstants.DELETE_SPECIAL_PROGRAM_MAPPING)
+    @PreAuthorize(PermissionsContants.DELETE_GRAD_SPECIAL_PROGRAM)
+    public ResponseEntity<Void> deleteGradSpecialPrograms(@PathVariable(value = "specialProgramID", required = true) String specialProgramID) { 
+    	logger.debug("deleteGradPrograms : ");
+    	validation.requiredField(specialProgramID, "Special Program ID");
+    	if(validation.hasErrors()) {
+    		validation.stopOnErrors();
+    		return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+    	}
+        return response.DELETE(programManagementService.deleteGradSpecialPrograms(UUID.fromString(specialProgramID)));
+    }
+    
+    @GetMapping(EducGradProgramManagementApiConstants.GET_ALL_SPECIAL_PROGRAM_RULES)
+    @PreAuthorize(PermissionsContants.READ_GRAD_SPECIAL_PROGRAM_RULES)
+    public List<GradSpecialProgramRule> getAllSpecialProgramRules(
+    		@RequestParam(value = "specialProgramID", required = true) String specialProgramID, 
+            @RequestParam(value = "requirementType", required = false) String requirementType) { 
+    	logger.debug("get All Special Program Rules : ");
+    	OAuth2AuthenticationDetails auth = (OAuth2AuthenticationDetails) SecurityContextHolder.getContext().getAuthentication().getDetails(); 
+    	String accessToken = auth.getTokenValue();
+        return programManagementService.getAllSpecialProgramRuleList(UUID.fromString(specialProgramID),requirementType,accessToken);
+    }
+    
+    @PostMapping(EducGradProgramManagementApiConstants.GET_ALL_SPECIAL_PROGRAM_RULES)
+    @PreAuthorize(PermissionsContants.CREATE_GRAD_SPECIAL_PROGRAM_RULES)
+    public ResponseEntity<ApiResponseModel<GradSpecialProgramRule>> createGradSpecialProgramRules(@Valid @RequestBody GradSpecialProgramRule gradSpecialProgramRule) { 
+    	logger.debug("createGradSpecialProgramRules : ");
+    	validation.requiredField(gradSpecialProgramRule.getSpecialProgramID(), "Special Program ID");
+    	validation.requiredField(gradSpecialProgramRule.getRequirementType(), "Requirement Type");
+    	validation.requiredField(gradSpecialProgramRule.getRuleCode(), "Rule Code");
+    	validation.requiredField(gradSpecialProgramRule.getRequirementName(), "Requirement Name");
+    	if(validation.hasErrors()) {
+    		validation.stopOnErrors();
+    		return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+    	}
+    	OAuth2AuthenticationDetails auth = (OAuth2AuthenticationDetails) SecurityContextHolder.getContext().getAuthentication().getDetails(); 
+    	String accessToken = auth.getTokenValue();
+    	return response.CREATED(programManagementService.createGradSpecialProgramRules(gradSpecialProgramRule,accessToken));
+    }
+    
+    @PutMapping(EducGradProgramManagementApiConstants.GET_ALL_SPECIAL_PROGRAM_RULES)
+    @PreAuthorize(PermissionsContants.UPDATE_GRAD_SPECIAL_PROGRAM_RULES)
+    public ResponseEntity<ApiResponseModel<GradSpecialProgramRule>> updateGradProgramRules(@Valid @RequestBody GradSpecialProgramRule gradSpecialProgramRule) { 
+    	logger.debug("updateGradProgramRules : ");
+    	validation.requiredField(gradSpecialProgramRule.getSpecialProgramID(), "Special Program ID");
+    	validation.requiredField(gradSpecialProgramRule.getRequirementType(), "Requirement Type");
+    	validation.requiredField(gradSpecialProgramRule.getRuleCode(), "Rule Code");
+    	validation.requiredField(gradSpecialProgramRule.getRequirementName(), "Requirement Name");
+    	if(validation.hasErrors()) {
+    		validation.stopOnErrors();
+    		return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+    	}
+    	OAuth2AuthenticationDetails auth = (OAuth2AuthenticationDetails) SecurityContextHolder.getContext().getAuthentication().getDetails(); 
+    	String accessToken = auth.getTokenValue();
+    	return response.UPDATED(programManagementService.updateGradSpecialProgramRules(gradSpecialProgramRule,accessToken));
+    }
+    
+    @DeleteMapping(EducGradProgramManagementApiConstants.DELETE_SPECIAL_PROGRAM_RULES_MAPPING)
+    @PreAuthorize(PermissionsContants.DELETE_GRAD_SPECIAL_PROGRAM_RULES)
+    public ResponseEntity<Void> deleteGradSpecialProgramRules(@PathVariable(value = "programRuleID", required = true) String programRuleID) { 
+    	logger.debug("deleteGradProgramRules : ");    	
+        return response.DELETE(programManagementService.deleteGradSpecailProgramRules(UUID.fromString(programRuleID)));
+    }
+    
+    
 }
