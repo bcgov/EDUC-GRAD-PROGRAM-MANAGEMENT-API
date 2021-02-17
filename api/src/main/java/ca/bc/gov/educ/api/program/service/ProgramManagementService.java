@@ -152,16 +152,19 @@ public class ProgramManagementService {
 		return specialCaseTransformer.transformToDTO(gradSpecialCaseRepository.findById(specialCode));
 	}
 
-	public GradRuleDetails getSpecificRuleDetails(String ruleCode) {
-		GradRuleDetails details = new GradRuleDetails();
-		GradProgramRule gradProgramRule = gradProgramRulesTransformer.transformToDTO(gradProgramRulesRepository.findByRuleCode(ruleCode));
-		if(gradProgramRule != null) {
-			details.setRuleCode(gradProgramRule.getRuleCode());
-			details.setRequirementName(gradProgramRule.getRequirementName());			
-			details.setProgramCode(gradProgramRule.getProgramCode());
-			
+	public List<GradRuleDetails> getSpecificRuleDetails(String ruleCode) {
+		List<GradRuleDetails> detailList = new ArrayList<GradRuleDetails>();
+		List<GradProgramRule> gradProgramRule = gradProgramRulesTransformer.transformToDTO(gradProgramRulesRepository.findByRuleCode(ruleCode));
+		if(gradProgramRule.size() > 0) {
+			gradProgramRule.forEach(gpR -> {
+				GradRuleDetails details = new GradRuleDetails();
+				details.setRuleCode(gpR.getRuleCode());
+				details.setRequirementName(gpR.getRequirementName());			
+				details.setProgramCode(gpR.getProgramCode());
+				detailList.add(details);
+			});			
 		}
-		return details;
+		return detailList;
 	}
 
 	public List<GradLetterGrade> getAllLetterGradesList() {
