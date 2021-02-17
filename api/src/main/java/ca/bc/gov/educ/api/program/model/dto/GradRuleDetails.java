@@ -8,7 +8,7 @@ import lombok.EqualsAndHashCode;
 @Data
 @EqualsAndHashCode(callSuper=false)
 @Component
-public class GradRuleDetails extends BaseModel {
+public class GradRuleDetails {
 
 	private String ruleCode; 
 	private String requirementName;
