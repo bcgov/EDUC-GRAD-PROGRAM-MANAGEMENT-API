@@ -1,7 +1,6 @@
 package ca.bc.gov.educ.api.program.repository;
 
 import java.util.List;
-import java.util.Optional;
 import java.util.UUID;
 
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -22,7 +21,7 @@ public interface GradProgramRulesRepository extends JpaRepository<GradProgramRul
     @Override
     List<GradProgramRulesEntity> findAllById(Iterable<UUID> iterable);
 
-    Optional<GradProgramRulesEntity> findByRuleCode(String ruleCode);
+    List<GradProgramRulesEntity> findByRuleCode(String ruleCode);
 
     @Query("select c.id from GradProgramRulesEntity c where c.ruleCode=:ruleCode and c.programCode=:programCode")
 	UUID findIdByRuleCode(String ruleCode,String programCode);

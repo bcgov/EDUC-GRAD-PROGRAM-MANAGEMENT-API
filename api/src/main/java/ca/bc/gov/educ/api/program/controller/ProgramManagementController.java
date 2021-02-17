@@ -178,7 +178,7 @@ public class ProgramManagementController {
     
     @GetMapping(EducGradProgramManagementApiConstants.GET_ALL_SPECIFIC_PROGRAM_RULES_BY_RULE)
     @PreAuthorize(PermissionsContants.READ_GRAD_PROGRAM_RULES)
-    public GradRuleDetails getSpecificRuleDetails(@PathVariable String ruleCode) { 
+    public List<GradRuleDetails> getSpecificRuleDetails(@PathVariable String ruleCode) { 
     	logger.debug("getSpecificRuleDetails : ");
         return programManagementService.getSpecificRuleDetails(ruleCode);
     }

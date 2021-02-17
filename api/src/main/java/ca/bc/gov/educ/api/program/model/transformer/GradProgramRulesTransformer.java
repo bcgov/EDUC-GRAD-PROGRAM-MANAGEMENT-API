@@ -1,6 +1,5 @@
 package ca.bc.gov.educ.api.program.model.transformer;
 
-import java.sql.Date;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -11,7 +10,6 @@ import org.springframework.stereotype.Component;
 
 import ca.bc.gov.educ.api.program.model.dto.GradProgramRule;
 import ca.bc.gov.educ.api.program.model.entity.GradProgramRulesEntity;
-import ca.bc.gov.educ.api.program.util.EducGradProgramManagementApiUtils;
 
 
 @Component
