@@ -18,6 +18,7 @@ public class EducGradProgramManagementApiConstants {
     public static final String GET_PROGRAM_MAPPING = "/programs/{programCode}";
     public static final String DELETE_PROGRAM_RULES_MAPPING = "/programrules/{programRuleID}";
     public static final String DELETE_SPECIAL_PROGRAM_RULES_MAPPING = "/specialprogramrules/{programRuleID}";
+    public static final String GET_ALL_SPECIAL_PROGRAM_MAPPING_BY_ID = "/specialprograms/{specialProgramID}";
 
     //Attribute Constants
     public static final String GET_ALL_PROGRAM_SETS_BY_PROGRAM_CODE = "/programsets/{programCode}";

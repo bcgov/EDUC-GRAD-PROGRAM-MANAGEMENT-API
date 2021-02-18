@@ -206,6 +206,21 @@ public class ProgramManagementController {
         return programManagementService.getRequirementByRequirementType(typeCode);
     }  
     
+    @GetMapping(EducGradProgramManagementApiConstants.GET_ALL_SPECIAL_PROGRAM_MAPPING_BY_ID)
+    @PreAuthorize(PermissionsContants.READ_GRAD_SPECIAL_PROGRAM)
+    public ResponseEntity<GradSpecialProgram> getAllSpecialProgramsByID(@PathVariable String specialProgramID) { 
+    	logger.debug("getAllSpecialProgramsByID : ");
+        return response.GET(programManagementService.getSpecialProgramByID(UUID.fromString(specialProgramID)));
+    }
+    
+    @GetMapping(EducGradProgramManagementApiConstants.GET_ALL_SPECIAL_PROGRAM_MAPPING)
+    @PreAuthorize(PermissionsContants.READ_GRAD_SPECIAL_PROGRAM)
+    public ResponseEntity<List<GradSpecialProgram>> getAllSpecialPrograms() { 
+    	logger.debug("getAllSpecialPrograms : ");
+        return response.GET(programManagementService.getAllSpecialProgramList(),new TypeToken<List<GradSpecialProgram>>() {
+		}.getType());
+    }
+    
     @GetMapping(EducGradProgramManagementApiConstants.GET_ALL_SPECIAL_PROGRAM_BY_PROGRAM_CODE_MAPPING)
     @PreAuthorize(PermissionsContants.READ_GRAD_SPECIAL_PROGRAM)
     public ResponseEntity<List<GradSpecialProgram>> getAllSpecialPrograms(@PathVariable String programCode) { 
