@@ -496,4 +496,19 @@ public class ProgramManagementService {
 			return 0;			
 		}
 	}
+
+	public List<GradSpecialProgram> getAllSpecialProgramList() {
+		List<GradSpecialProgram> programList  = new ArrayList<GradSpecialProgram>();
+        try {
+        	programList = gradSpecialProgramTransformer.transformToDTO(gradSpecialProgramRepository.findAll());            
+        } catch (Exception e) {
+            logger.debug("Exception:" + e);
+        }
+
+        return programList;
+	}
+
+	public GradSpecialProgram getSpecialProgramByID(UUID specialProgramID) {
+		return gradSpecialProgramTransformer.transformToDTO(gradSpecialProgramRepository.findById(specialProgramID));
+	}
 }
