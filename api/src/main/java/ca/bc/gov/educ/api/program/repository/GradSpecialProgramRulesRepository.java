@@ -22,7 +22,7 @@ public interface GradSpecialProgramRulesRepository extends JpaRepository<GradSpe
     @Override
     List<GradSpecialProgramRulesEntity> findAllById(Iterable<UUID> iterable);
 
-    Optional<GradSpecialProgramRulesEntity> findByRuleCode(String ruleCode);
+    List<GradSpecialProgramRulesEntity> findByRuleCode(String ruleCode);
 
     @Query("select c.id from GradSpecialProgramRulesEntity c where c.ruleCode=:ruleCode and c.specialProgramID=:specialProgramID")
 	UUID findIdByRuleCode(String ruleCode,UUID specialProgramID);
