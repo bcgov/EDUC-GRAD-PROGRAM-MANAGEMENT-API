@@ -8,11 +8,12 @@ import lombok.EqualsAndHashCode;
 @Data
 @EqualsAndHashCode(callSuper=false)
 @Component
-public class GradRuleDetails extends BaseModel {
+public class GradRuleDetails {
 
 	private String ruleCode; 
 	private String requirementName;
 	private String programCode;	
+	private String specialProgramCode;
 	
 	@Override
 	public String toString() {

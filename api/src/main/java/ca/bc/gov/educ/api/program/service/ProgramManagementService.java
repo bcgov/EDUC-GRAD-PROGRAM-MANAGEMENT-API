@@ -164,6 +164,18 @@ public class ProgramManagementService {
 				detailList.add(details);
 			});			
 		}
+		List<GradSpecialProgramRule> gradSpecialProgramRule = gradSpecialProgramRulesTransformer.transformToDTO(gradSpecialProgramRulesRepository.findByRuleCode(ruleCode));
+		if(gradSpecialProgramRule.size() > 0) {
+			gradSpecialProgramRule.forEach(gpR -> {
+				GradRuleDetails details = new GradRuleDetails();
+				details.setRuleCode(gpR.getRuleCode());
+				details.setRequirementName(gpR.getRequirementName());	
+				GradSpecialProgram gradSpecialProgram = gradSpecialProgramTransformer.transformToDTO(gradSpecialProgramRepository.findById(gpR.getSpecialProgramID()));
+				details.setProgramCode(gradSpecialProgram.getProgramCode());
+				details.setSpecialProgramCode(gradSpecialProgram.getSpecialProgramCode());
+				detailList.add(details);
+			});			
+		}
 		return detailList;
 	}
 
