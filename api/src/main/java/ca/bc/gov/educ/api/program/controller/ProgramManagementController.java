@@ -60,15 +60,22 @@ public class ProgramManagementController {
     @PreAuthorize(PermissionsContants.READ_GRAD_PROGRAM)
     public ResponseEntity<List<GradProgram>> getAllPrograms() { 
     	logger.debug("getAllPrograms : ");
-        return response.GET(programManagementService.getAllProgramList(),new TypeToken<List<GradProgram>>() {
-		}.getType());
+    	List<GradProgram> programList = programManagementService.getAllProgramList();
+    	if(programList.size() > 0 ) {
+    		return response.GET(programList,new TypeToken<List<GradProgram>>() {}.getType());
+    	}
+    	return response.NO_CONTENT();
     }
     
     @GetMapping(EducGradProgramManagementApiConstants.GET_PROGRAM_MAPPING)
     @PreAuthorize(PermissionsContants.READ_GRAD_PROGRAM)
     public ResponseEntity<GradProgram> getSpecificProgram(@PathVariable String programCode) { 
     	logger.debug("getSpecificProgram : ");
-        return response.GET(programManagementService.getSpecificProgram(programCode));
+    	GradProgram gradProgram = programManagementService.getSpecificProgram(programCode);
+    	if(gradProgram != null) {
+    		return response.GET(gradProgram);
+    	}
+    	return response.NO_CONTENT();
     }
     
     @PostMapping(EducGradProgramManagementApiConstants.GET_ALL_PROGRAM_MAPPING)
@@ -112,13 +119,17 @@ public class ProgramManagementController {
     
     @GetMapping(EducGradProgramManagementApiConstants.GET_ALL_PROGRAM_RULES)
     @PreAuthorize(PermissionsContants.READ_GRAD_PROGRAM_RULES)
-    public List<GradProgramRule> getAllProgramsRules(
+    public ResponseEntity<List<GradProgramRule>> getAllProgramsRules(
     		@RequestParam(value = "programCode", required = true) String programCode, 
             @RequestParam(value = "requirementType", required = false) String requirementType) { 
     	logger.debug("get All Program Rules : ");
     	OAuth2AuthenticationDetails auth = (OAuth2AuthenticationDetails) SecurityContextHolder.getContext().getAuthentication().getDetails(); 
     	String accessToken = auth.getTokenValue();
-        return programManagementService.getAllProgramRuleList(programCode,requirementType,accessToken);
+    	List<GradProgramRule> programRuleList = programManagementService.getAllProgramRuleList(programCode,requirementType,accessToken);
+    	if(programRuleList.size() > 0) {
+    		return response.GET(programRuleList,new TypeToken<List<GradProgramRule>>() {}.getType());
+    	}
+    	return response.NO_CONTENT();
     }
     
     @PostMapping(EducGradProgramManagementApiConstants.GET_ALL_PROGRAM_RULES)
@@ -164,16 +175,24 @@ public class ProgramManagementController {
     
     @GetMapping(EducGradProgramManagementApiConstants.GET_ALL_SPECIAL_CASE_MAPPING)
     @PreAuthorize(PermissionsContants.READ_GRAD_SPECIAL_CASE)
-    public List<GradSpecialCase> getAllSpecialCases() { 
+    public ResponseEntity<List<GradSpecialCase>> getAllSpecialCases() { 
     	logger.debug("getAllSpecialCases : ");
-        return programManagementService.getAllSpecialCaseList();
+    	List<GradSpecialCase> specialList = programManagementService.getAllSpecialCaseList();
+    	if(specialList.size() > 0 ) {
+    		return response.GET(specialList,new TypeToken<List<GradSpecialCase>>() {}.getType());
+    	}
+    	return response.NO_CONTENT();
     }
     
     @GetMapping(EducGradProgramManagementApiConstants.GET_ALL_SPECIAL_CASE__BY_SPECIAL_CODE)
     @PreAuthorize(PermissionsContants.READ_GRAD_SPECIAL_CASE)
-    public GradSpecialCase getSpecificSpecialCases(@PathVariable String specialCode) { 
+    public ResponseEntity<GradSpecialCase> getSpecificSpecialCases(@PathVariable String specialCode) { 
     	logger.debug("getSpecificSpecialCases : ");
-        return programManagementService.getSpecificSpecialCase(specialCode);
+    	GradSpecialCase gradSpecialCase = programManagementService.getSpecificSpecialCase(specialCode);
+    	if(gradSpecialCase != null) {
+    		return response.GET(gradSpecialCase) ;
+    	}
+    	return response.NO_CONTENT();
     }
     
     @GetMapping(EducGradProgramManagementApiConstants.GET_ALL_SPECIFIC_PROGRAM_RULES_BY_RULE)
@@ -271,13 +290,17 @@ public class ProgramManagementController {
     
     @GetMapping(EducGradProgramManagementApiConstants.GET_ALL_SPECIAL_PROGRAM_RULES)
     @PreAuthorize(PermissionsContants.READ_GRAD_SPECIAL_PROGRAM_RULES)
-    public List<GradSpecialProgramRule> getAllSpecialProgramRules(
+    public ResponseEntity<List<GradSpecialProgramRule>> getAllSpecialProgramRules(
     		@RequestParam(value = "specialProgramID", required = true) String specialProgramID, 
             @RequestParam(value = "requirementType", required = false) String requirementType) { 
     	logger.debug("get All Special Program Rules : ");
     	OAuth2AuthenticationDetails auth = (OAuth2AuthenticationDetails) SecurityContextHolder.getContext().getAuthentication().getDetails(); 
     	String accessToken = auth.getTokenValue();
-        return programManagementService.getAllSpecialProgramRuleList(UUID.fromString(specialProgramID),requirementType,accessToken);
+    	List<GradSpecialProgramRule> programRuleList = programManagementService.getAllSpecialProgramRuleList(UUID.fromString(specialProgramID),requirementType,accessToken);
+    	if(programRuleList.size() > 0) {
+    		return response.GET(programRuleList,new TypeToken<List<GradSpecialProgramRule>>() {}.getType());
+    	}
+    	return response.NO_CONTENT();
     }
     
     @PostMapping(EducGradProgramManagementApiConstants.GET_ALL_SPECIAL_PROGRAM_RULES)
