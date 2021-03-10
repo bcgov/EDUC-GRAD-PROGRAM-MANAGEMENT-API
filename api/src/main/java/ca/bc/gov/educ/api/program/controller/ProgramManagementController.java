@@ -344,5 +344,21 @@ public class ProgramManagementController {
         return response.DELETE(programManagementService.deleteGradSpecailProgramRules(UUID.fromString(programRuleID)));
     }
     
+    @GetMapping(EducGradProgramManagementApiConstants.GET_SPECIAL_PROGRAM_RULES_BY_PROGRAM_CODE_AND_SPECIAL_PROGRAM_CODE)
+    @PreAuthorize(PermissionsContants.READ_GRAD_SPECIAL_PROGRAM_RULES)
+    public ResponseEntity<List<GradSpecialProgramRule>> getSpecialProgramRulesByProgramCodeAndSpecialProgramCode(
+    		@PathVariable(value = "programCode", required = true) String programCode, 
+    		@PathVariable(value = "specialProgramCode", required = true) String specialProgramCode,
+    		@PathVariable(value = "requirementType", required = true) String requirementType) { 
+    	logger.debug("get Special Program Rules By Program Code And Special Program Code : ");
+    	OAuth2AuthenticationDetails auth = (OAuth2AuthenticationDetails) SecurityContextHolder.getContext().getAuthentication().getDetails(); 
+    	String accessToken = auth.getTokenValue();
+    	List<GradSpecialProgramRule> programRuleList = programManagementService.getSpecialProgramRulesByProgramCodeAndSpecialProgramCode(programCode,specialProgramCode,requirementType,accessToken);
+    	if(programRuleList.size() > 0) {
+    		return response.GET(programRuleList,new TypeToken<List<GradSpecialProgramRule>>() {}.getType());
+    	}
+    	return response.NO_CONTENT();
+    }
+    
     
 }

@@ -523,4 +523,15 @@ public class ProgramManagementService {
 	public GradSpecialProgram getSpecialProgramByID(UUID specialProgramID) {
 		return gradSpecialProgramTransformer.transformToDTO(gradSpecialProgramRepository.findById(specialProgramID));
 	}
+
+	public List<GradSpecialProgramRule> getSpecialProgramRulesByProgramCodeAndSpecialProgramCode(String programCode,
+			String specialProgramCode,String requirementType,String accessToken) {
+		Optional<GradSpecialProgramEntity> existingObjectCheck = gradSpecialProgramRepository.findByProgramCodeAndSpecialProgramCode(programCode, specialProgramCode);
+		if(existingObjectCheck.isPresent()) {
+			return getAllSpecialProgramRuleList(existingObjectCheck.get().getId(),requirementType,accessToken);
+		}else {
+			validation.addErrorAndStop(String.format("Special Program Code [%s] and Program Code [%s] combination does not exist",specialProgramCode,programCode));
+			return new ArrayList<GradSpecialProgramRule>();
+		}
+	}
 }
