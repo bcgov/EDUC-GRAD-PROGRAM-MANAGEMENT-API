@@ -534,4 +534,14 @@ public class ProgramManagementService {
 			return new ArrayList<GradSpecialProgramRule>();
 		}
 	}
+
+	public GradSpecialProgram getSpecialProgram(String programCode, String specialProgramCode) {
+		GradSpecialProgram specialProgram = gradSpecialProgramTransformer.transformToDTO(gradSpecialProgramRepository.findByProgramCodeAndSpecialProgramCode(programCode, specialProgramCode));
+		if(specialProgram != null) {
+			return specialProgram;
+		}else {
+			validation.addErrorAndStop(String.format("Special Program Code [%s] and Program Code [%s] combination does not exist",specialProgramCode,programCode));
+			return null;
+		}
+	}
 }

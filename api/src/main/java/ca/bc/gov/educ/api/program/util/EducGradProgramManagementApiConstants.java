@@ -11,6 +11,7 @@ public class EducGradProgramManagementApiConstants {
     public static final String GET_ALL_PROGRAM_MAPPING = "/programs";
     public static final String GET_ALL_SPECIAL_PROGRAM_MAPPING = "/specialprograms";
     public static final String GET_ALL_SPECIAL_PROGRAM_BY_PROGRAM_CODE_MAPPING = "/specialprograms/{programCode}";
+    public static final String GET_ALL_SPECIAL_PROGRAM_BY_PROGRAM_CODE_AND_SPECIAL_PROGRAM_MAPPING = "/specialprograms/{programCode}/{specialProgramCode}";
     public static final String GET_ALL_SPECIAL_CASE_MAPPING = "/specialcase";
     public static final String GET_ALL_LETTER_GRADE_MAPPING = "/lettergrade";
     public static final String DELETE_PROGRAM_MAPPING = "/programs/{programCode}";
