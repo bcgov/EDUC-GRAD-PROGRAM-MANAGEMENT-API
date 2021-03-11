@@ -248,6 +248,13 @@ public class ProgramManagementController {
 		}.getType());
     }
     
+    @GetMapping(EducGradProgramManagementApiConstants.GET_ALL_SPECIAL_PROGRAM_BY_PROGRAM_CODE_AND_SPECIAL_PROGRAM_MAPPING)
+    @PreAuthorize(PermissionsContants.READ_GRAD_SPECIAL_PROGRAM)
+    public ResponseEntity<GradSpecialProgram> getSpecialPrograms(@PathVariable String programCode,@PathVariable String specialProgramCode) { 
+    	logger.debug("getSpecialPrograms : ");
+        return response.GET(programManagementService.getSpecialProgram(programCode,specialProgramCode));
+    }
+    
     @PostMapping(EducGradProgramManagementApiConstants.GET_ALL_SPECIAL_PROGRAM_MAPPING)
     @PreAuthorize(PermissionsContants.CREATE_GRAD_SPECIAL_PROGRAM)
     public ResponseEntity<ApiResponseModel<GradSpecialProgram>> createGradSpecailPrograms(@Valid @RequestBody GradSpecialProgram gradSpecialProgram) { 
