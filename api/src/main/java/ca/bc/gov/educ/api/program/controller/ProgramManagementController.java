@@ -356,7 +356,7 @@ public class ProgramManagementController {
     public ResponseEntity<List<GradSpecialProgramRule>> getSpecialProgramRulesByProgramCodeAndSpecialProgramCode(
     		@PathVariable(value = "programCode", required = true) String programCode, 
     		@PathVariable(value = "specialProgramCode", required = true) String specialProgramCode,
-    		@PathVariable(value = "requirementType", required = true) String requirementType) { 
+    		@PathVariable(value = "requirementType", required = false) String requirementType) { 
     	logger.debug("get Special Program Rules By Program Code And Special Program Code : ");
     	OAuth2AuthenticationDetails auth = (OAuth2AuthenticationDetails) SecurityContextHolder.getContext().getAuthentication().getDetails(); 
     	String accessToken = auth.getTokenValue();
