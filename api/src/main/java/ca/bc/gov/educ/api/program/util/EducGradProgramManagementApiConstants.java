@@ -29,6 +29,7 @@ public class EducGradProgramManagementApiConstants {
     public static final String GET_ALL_PROGRAM_RULES = "/programrules";
     public static final String GET_ALL_SPECIAL_PROGRAM_RULES = "/specialprogramrules";
     public static final String GET_SPECIAL_PROGRAM_RULES_BY_PROGRAM_CODE_AND_SPECIAL_PROGRAM_CODE = "/specialprogramrules/{programCode}/{specialProgramCode}/{requirementType}";
+    public static final String GET_SPECIAL_PROGRAM_RULES_BY_PROGRAM_CODE_AND_SPECIAL_PROGRAM_CODE_ONLY = "/specialprogramrules/{programCode}/{specialProgramCode}";
     public static final String GET_ALL_SPECIAL_CASE__BY_SPECIAL_CODE = "/specialcase/{specialCode}";
     public static final String GET_ALL_LETTER_GRADE__BY_LETTER_GRADE = "/lettergrade/{letterGrade}";
     public static final String GET_ALL_SPECIFIC_PROGRAM_RULES_BY_RULE = "/programrules/{ruleCode}";
