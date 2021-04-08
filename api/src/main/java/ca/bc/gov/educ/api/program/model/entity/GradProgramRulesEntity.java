@@ -57,4 +57,7 @@ public class GradProgramRulesEntity  extends BaseEntity {
 	
 	@Column(name = "FK_GRAD_PROGRAM_CODE", nullable = true)
     private String programCode;
+	
+	@Column(name = "RULE_CATEGORY", nullable = true)
+    private String ruleCategory;
 }
