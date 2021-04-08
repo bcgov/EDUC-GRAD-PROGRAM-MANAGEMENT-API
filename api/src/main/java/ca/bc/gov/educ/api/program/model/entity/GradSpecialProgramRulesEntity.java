@@ -57,4 +57,7 @@ public class GradSpecialProgramRulesEntity  extends BaseEntity {
 	
 	@Column(name = "FK_GRAD_SPECIAL_PROGRAM_ID", nullable = true)
     private UUID specialProgramID;
+	
+	@Column(name = "RULE_CATEGORY", nullable = true)
+    private String ruleCategory;
 }
