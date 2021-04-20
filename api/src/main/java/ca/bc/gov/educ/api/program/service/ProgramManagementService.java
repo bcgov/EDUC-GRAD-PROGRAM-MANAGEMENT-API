@@ -2,6 +2,8 @@ package ca.bc.gov.educ.api.program.service;
 
 
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
@@ -543,5 +545,43 @@ public class ProgramManagementService {
 			validation.addErrorAndStop(String.format("Special Program Code [%s] and Program Code [%s] combination does not exist",specialProgramCode,programCode));
 			return null;
 		}
+	}
+
+	public List<GradProgramRule> getAllProgramRulesList(String accessToken) {
+		HttpHeaders httpHeaders = EducGradProgramManagementApiUtils.getHeaders(accessToken);
+		List<GradProgramRule> programRuleList  = new ArrayList<GradProgramRule>();
+    	programRuleList = gradProgramRulesTransformer.transformToDTO(gradProgramRulesRepository.findAll());   
+    	programRuleList.forEach(pR-> {
+    		GradRequirementTypes reqType = restTemplate.exchange(String.format(getRequirementTypeByCodeURL,pR.getRequirementType()), HttpMethod.GET,
+    				new HttpEntity<>(httpHeaders), GradRequirementTypes.class).getBody();
+    		pR.setRequirementTypeDesc(reqType.getDescription());
+    	});
+    	if(programRuleList.size() > 0) {
+	    	Collections.sort(programRuleList, Comparator.comparing(GradProgramRule::getProgramCode)
+	    			.thenComparing(GradProgramRule::getRuleCode)
+	    			.reversed());   
+    	}
+        return programRuleList;
+	}
+	
+	public List<GradSpecialProgramRule>  getAllSpecialProgramRulesList(String accessToken) {
+		HttpHeaders httpHeaders = EducGradProgramManagementApiUtils.getHeaders(accessToken);
+		List<GradSpecialProgramRule> programRuleList  = new ArrayList<GradSpecialProgramRule>();
+        programRuleList = gradSpecialProgramRulesTransformer.transformToDTO(gradSpecialProgramRulesRepository.findAll());   
+    	programRuleList.forEach(pR-> {
+    		GradSpecialProgram gSp = gradSpecialProgramTransformer.transformToDTO(gradSpecialProgramRepository.findById(pR.getSpecialProgramID()));
+    		GradRequirementTypes reqType = restTemplate.exchange(String.format(getRequirementTypeByCodeURL,pR.getRequirementType()), HttpMethod.GET,
+    				new HttpEntity<>(httpHeaders), GradRequirementTypes.class).getBody();
+    		pR.setRequirementTypeDesc(reqType.getDescription());
+    		pR.setProgramCode(gSp.getProgramCode());
+    		pR.setSpecialProgramCode(gSp.getSpecialProgramCode());
+    	});
+    	if(programRuleList.size() > 0) {
+	    	Collections.sort(programRuleList, Comparator.comparing(GradSpecialProgramRule::getProgramCode)
+	    			.thenComparing(GradSpecialProgramRule::getSpecialProgramCode)
+	    			.thenComparing(GradSpecialProgramRule::getRuleCode)
+	    			.reversed());   
+    	}
+        return programRuleList;
 	}
 }
