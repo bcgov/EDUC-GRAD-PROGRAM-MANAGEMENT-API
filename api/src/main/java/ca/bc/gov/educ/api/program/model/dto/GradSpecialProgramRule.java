@@ -24,6 +24,8 @@ public class GradSpecialProgramRule extends BaseModel {
 	private String requirementDesc;
 	private String isActive;
 	private UUID specialProgramID;
+	private String programCode;
+	private String specialProgramCode;
 	private String ruleCategory;
 	
 	@Override
@@ -32,8 +34,9 @@ public class GradSpecialProgramRule extends BaseModel {
 				+ ", requirementType=" + requirementType + ", requirementTypeDesc=" + requirementTypeDesc
 				+ ", requiredCredits=" + requiredCredits + ", notMetDesc=" + notMetDesc + ", requiredLevel="
 				+ requiredLevel + ", languageOfInstruction=" + languageOfInstruction + ", requirementDesc="
-				+ requirementDesc + ", isActive=" + isActive + ", specialProgramID=" + specialProgramID + ", ruleCategory="+ruleCategory+ "]";
-	}
-	
+				+ requirementDesc + ", isActive=" + isActive + ", specialProgramID=" + specialProgramID
+				+ ", programCode=" + programCode + ", specialProgramCode=" + specialProgramCode + ", ruleCategory="
+				+ ruleCategory + "]";
+	}	
 	
 }

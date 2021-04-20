@@ -452,6 +452,35 @@ public class ProgramManagementController {
     	return response.NO_CONTENT();
     }
     
+    @GetMapping(value=EducGradProgramManagementApiConstants.GET_PROGRAM_RULES,produces= {"application/json"})
+    @PreAuthorize(PermissionsContants.READ_GRAD_PROGRAM_RULES)
+    @Operation(summary = "Get all Program Rules", description = "Get all Program Rules", tags = { "Program Rules" })
+    @ApiResponses(value = {@ApiResponse(responseCode = "200", description = "OK"), @ApiResponse(responseCode = "204", description = "NO CONTENT")})
+    public ResponseEntity<List<GradProgramRule>> getAllProgramsRules() { 
+    	logger.debug("get All Program Rules : ");
+    	OAuth2AuthenticationDetails auth = (OAuth2AuthenticationDetails) SecurityContextHolder.getContext().getAuthentication().getDetails(); 
+    	String accessToken = auth.getTokenValue();
+    	List<GradProgramRule> programRuleList = programManagementService.getAllProgramRulesList(accessToken);
+    	if(programRuleList.size() > 0) {
+    		return response.GET(programRuleList,new TypeToken<List<GradProgramRule>>() {}.getType());
+    	}
+    	return response.NO_CONTENT();
+    }
+    
+    @GetMapping(EducGradProgramManagementApiConstants.GET_SPECIAL_PROGRAM_RULES)
+    @PreAuthorize(PermissionsContants.READ_GRAD_SPECIAL_PROGRAM_RULES)
+    @Operation(summary = "Get all Special Program Rules", description = "Get all Special Program Rules", tags = { "Special Program Rules" })
+    @ApiResponses(value = {@ApiResponse(responseCode = "200", description = "OK"), @ApiResponse(responseCode = "204", description = "NO CONTENT")})
+    public ResponseEntity<List<GradSpecialProgramRule>> getAllSpecialProgramRules() { 
+    	logger.debug("get All Special Program Rules : ");
+    	OAuth2AuthenticationDetails auth = (OAuth2AuthenticationDetails) SecurityContextHolder.getContext().getAuthentication().getDetails(); 
+    	String accessToken = auth.getTokenValue();
+    	List<GradSpecialProgramRule> programRuleList = programManagementService.getAllSpecialProgramRulesList(accessToken);
+    	if(programRuleList.size() > 0) {
+    		return response.GET(programRuleList,new TypeToken<List<GradSpecialProgramRule>>() {}.getType());
+    	}
+    	return response.NO_CONTENT();
+    }
     
     
 }
