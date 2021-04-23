@@ -17,11 +17,9 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.http.HttpEntity;
-import org.springframework.http.HttpHeaders;
-import org.springframework.http.HttpMethod;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
+import org.springframework.web.reactive.function.client.WebClient;
 
 import ca.bc.gov.educ.api.program.model.dto.GradLetterGrade;
 import ca.bc.gov.educ.api.program.model.dto.GradProgram;
@@ -48,7 +46,6 @@ import ca.bc.gov.educ.api.program.repository.GradSpecialCaseRepository;
 import ca.bc.gov.educ.api.program.repository.GradSpecialProgramRepository;
 import ca.bc.gov.educ.api.program.repository.GradSpecialProgramRulesRepository;
 import ca.bc.gov.educ.api.program.util.EducGradProgramManagementApiConstants;
-import ca.bc.gov.educ.api.program.util.EducGradProgramManagementApiUtils;
 import ca.bc.gov.educ.api.program.util.GradBusinessRuleException;
 import ca.bc.gov.educ.api.program.util.GradValidation;
 
@@ -98,6 +95,9 @@ public class ProgramManagementService {
     
     @Autowired
     RestTemplate restTemplate;
+    
+    @Autowired
+    WebClient webClient;
 
     private static Logger logger = LoggerFactory.getLogger(ProgramManagementService.class);
 
@@ -119,17 +119,14 @@ public class ProgramManagementService {
     }
     
 	public List<GradProgramRule> getAllProgramRuleList(String programCode, String requirementType,String accessToken) {
-		HttpHeaders httpHeaders = EducGradProgramManagementApiUtils.getHeaders(accessToken);
 		List<GradProgramRule> programRuleList  = new ArrayList<GradProgramRule>();
         try {
         	if(StringUtils.isNotBlank(requirementType)) {
-        	restTemplate.exchange(String.format(getRequirementTypeByCodeURL,requirementType), HttpMethod.GET,
-    				new HttpEntity<>(httpHeaders), GradRequirementTypes.class).getBody();
+        		webClient.get().uri(String.format(getRequirementTypeByCodeURL,requirementType)).headers(h -> h.setBearerAuth(accessToken)).retrieve().bodyToMono(GradRequirementTypes.class).block();
         	}
         	programRuleList = gradProgramRulesTransformer.transformToDTO(gradProgramRulesRepository.findByProgramCodeAndRequirementType(programCode,requirementType));   
         	programRuleList.forEach(pR-> {
-        		GradRequirementTypes reqType = restTemplate.exchange(String.format(getRequirementTypeByCodeURL,pR.getRequirementType()), HttpMethod.GET,
-        				new HttpEntity<>(httpHeaders), GradRequirementTypes.class).getBody();
+        		GradRequirementTypes reqType = webClient.get().uri(String.format(getRequirementTypeByCodeURL,pR.getRequirementType())).headers(h -> h.setBearerAuth(accessToken)).retrieve().bodyToMono(GradRequirementTypes.class).block();
         		pR.setRequirementTypeDesc(reqType.getDescription());
         	});
         } catch (Exception e) {
@@ -240,15 +237,13 @@ public class ProgramManagementService {
 
 	public GradProgramRule createGradProgramRules(@Valid GradProgramRule gradProgramRule,String accessToken) {
 		GradProgramRulesEntity toBeSavedObject = gradProgramRulesTransformer.transformToEntity(gradProgramRule);
-		HttpHeaders httpHeaders = EducGradProgramManagementApiUtils.getHeaders(accessToken);
 		UUID existingObjectCheck = gradProgramRulesRepository.findIdByRuleCode(gradProgramRule.getRuleCode(),gradProgramRule.getProgramCode());
 		if(existingObjectCheck != null) {
 			validation.addErrorAndStop(String.format("This Rule Code [%s] is already associated to a Program Code [%s]",gradProgramRule.getRuleCode(),gradProgramRule.getProgramCode()));
 			return gradProgramRule;			
 		}else {	
 			try {
-				restTemplate.exchange(String.format(getRequirementTypeByCodeURL,gradProgramRule.getRequirementType()), HttpMethod.GET,
-	    				new HttpEntity<>(httpHeaders), GradRequirementTypes.class).getBody();
+				webClient.get().uri(String.format(getRequirementTypeByCodeURL,gradProgramRule.getRequirementType())).headers(h -> h.setBearerAuth(accessToken)).retrieve().bodyToMono(GradRequirementTypes.class).block();
 				return gradProgramRulesTransformer.transformToDTO(gradProgramRulesRepository.save(toBeSavedObject));
 				
 			}catch(Exception e) {
@@ -262,7 +257,6 @@ public class ProgramManagementService {
 
 	public GradProgramRule updateGradProgramRules(@Valid GradProgramRule gradProgramRule, String accessToken) {
 		GradProgramRulesEntity sourceObject = gradProgramRulesTransformer.transformToEntity(gradProgramRule);
-		HttpHeaders httpHeaders = EducGradProgramManagementApiUtils.getHeaders(accessToken);
 		Optional<GradProgramRulesEntity> gradProgramRulesOptional = gradProgramRulesRepository.findById(gradProgramRule.getId());
 		if(gradProgramRulesOptional.isPresent()) {
 			GradProgramRulesEntity gradRuleEnity = gradProgramRulesOptional.get();	
@@ -274,8 +268,7 @@ public class ProgramManagementService {
 					return gradProgramRule;			
 				}else {	
 					try {
-						restTemplate.exchange(String.format(getRequirementTypeByCodeURL,gradProgramRule.getRequirementType()), HttpMethod.GET,
-			    				new HttpEntity<>(httpHeaders), GradRequirementTypes.class).getBody();
+						webClient.get().uri(String.format(getRequirementTypeByCodeURL,gradProgramRule.getRequirementType())).headers(h -> h.setBearerAuth(accessToken)).retrieve().bodyToMono(GradRequirementTypes.class).block();
 						return gradProgramRulesTransformer.transformToDTO(gradProgramRulesRepository.save(gradRuleEnity));
 						
 					}catch(Exception e) {
@@ -288,8 +281,7 @@ public class ProgramManagementService {
 			}else {
 				try {
 					BeanUtils.copyProperties(sourceObject,gradRuleEnity,"createdBy","createdTimestamp");
-					restTemplate.exchange(String.format(getRequirementTypeByCodeURL,gradProgramRule.getRequirementType()), HttpMethod.GET,
-		    				new HttpEntity<>(httpHeaders), GradRequirementTypes.class).getBody();
+					webClient.get().uri(String.format(getRequirementTypeByCodeURL,gradProgramRule.getRequirementType())).headers(h -> h.setBearerAuth(accessToken)).retrieve().bodyToMono(GradRequirementTypes.class).block();
 					return gradProgramRulesTransformer.transformToDTO(gradProgramRulesRepository.save(gradRuleEnity));
 					
 				}catch(Exception e) {
@@ -411,17 +403,14 @@ public class ProgramManagementService {
 	}
 	
 	public List<GradSpecialProgramRule>  getAllSpecialProgramRuleList(UUID specialProgramID, String requirementType,String accessToken) {
-		HttpHeaders httpHeaders = EducGradProgramManagementApiUtils.getHeaders(accessToken);
 		List<GradSpecialProgramRule> programRuleList  = new ArrayList<GradSpecialProgramRule>();
         try {
         	if(StringUtils.isNotBlank(requirementType)) {
-        	restTemplate.exchange(String.format(getRequirementTypeByCodeURL,requirementType), HttpMethod.GET,
-    				new HttpEntity<>(httpHeaders), GradRequirementTypes.class).getBody();
+        		webClient.get().uri(String.format(getRequirementTypeByCodeURL,requirementType)).headers(h -> h.setBearerAuth(accessToken)).retrieve().bodyToMono(GradRequirementTypes.class).block();
         	}
         	programRuleList = gradSpecialProgramRulesTransformer.transformToDTO(gradSpecialProgramRulesRepository.findBySpecialProgramIDAndRequirementType(specialProgramID,requirementType));   
         	programRuleList.forEach(pR-> {
-        		GradRequirementTypes reqType = restTemplate.exchange(String.format(getRequirementTypeByCodeURL,pR.getRequirementType()), HttpMethod.GET,
-        				new HttpEntity<>(httpHeaders), GradRequirementTypes.class).getBody();
+        		GradRequirementTypes reqType = webClient.get().uri(String.format(getRequirementTypeByCodeURL,pR.getRequirementType())).headers(h -> h.setBearerAuth(accessToken)).retrieve().bodyToMono(GradRequirementTypes.class).block();
         		pR.setRequirementTypeDesc(reqType.getDescription());
         	});
         } catch (Exception e) {
@@ -434,7 +423,6 @@ public class ProgramManagementService {
 	public GradSpecialProgramRule createGradSpecialProgramRules(@Valid GradSpecialProgramRule gradSpecialProgramRule,
 			String accessToken) {
 		GradSpecialProgramRulesEntity toBeSavedObject = gradSpecialProgramRulesTransformer.transformToEntity(gradSpecialProgramRule);
-		HttpHeaders httpHeaders = EducGradProgramManagementApiUtils.getHeaders(accessToken);
 		UUID existingObjectCheck = gradSpecialProgramRulesRepository.findIdByRuleCode(gradSpecialProgramRule.getRuleCode(),gradSpecialProgramRule.getSpecialProgramID());
 		if(existingObjectCheck != null) {
 			GradSpecialProgramEntity optional = gradSpecialProgramRepository.getOne(gradSpecialProgramRule.getSpecialProgramID());
@@ -442,8 +430,7 @@ public class ProgramManagementService {
 			return gradSpecialProgramRule;			
 		}else {	
 			try {
-				restTemplate.exchange(String.format(getRequirementTypeByCodeURL,gradSpecialProgramRule.getRequirementType()), HttpMethod.GET,
-	    				new HttpEntity<>(httpHeaders), GradRequirementTypes.class).getBody();
+				webClient.get().uri(String.format(getRequirementTypeByCodeURL,gradSpecialProgramRule.getRequirementType())).headers(h -> h.setBearerAuth(accessToken)).retrieve().bodyToMono(GradRequirementTypes.class).block();
 				return gradSpecialProgramRulesTransformer.transformToDTO(gradSpecialProgramRulesRepository.save(toBeSavedObject));
 				
 			}catch(Exception e) {
@@ -457,7 +444,6 @@ public class ProgramManagementService {
 	
 	public GradSpecialProgramRule updateGradSpecialProgramRules(@Valid GradSpecialProgramRule gradSpecialProgramRule, String accessToken) {
 		GradSpecialProgramRulesEntity sourceObject = gradSpecialProgramRulesTransformer.transformToEntity(gradSpecialProgramRule);
-		HttpHeaders httpHeaders = EducGradProgramManagementApiUtils.getHeaders(accessToken);
 		Optional<GradSpecialProgramRulesEntity> gradSpecialProgramRulesOptional = gradSpecialProgramRulesRepository.findById(gradSpecialProgramRule.getId());
 		if(gradSpecialProgramRulesOptional.isPresent()) {
 			GradSpecialProgramRulesEntity gradRuleEnity = gradSpecialProgramRulesOptional.get();	
@@ -470,8 +456,7 @@ public class ProgramManagementService {
 					return gradSpecialProgramRule;			
 				}else {	
 					try {
-						restTemplate.exchange(String.format(getRequirementTypeByCodeURL,gradSpecialProgramRule.getRequirementType()), HttpMethod.GET,
-			    				new HttpEntity<>(httpHeaders), GradRequirementTypes.class).getBody();
+						webClient.get().uri(String.format(getRequirementTypeByCodeURL,gradSpecialProgramRule.getRequirementType())).headers(h -> h.setBearerAuth(accessToken)).retrieve().bodyToMono(GradRequirementTypes.class).block();
 						return gradSpecialProgramRulesTransformer.transformToDTO(gradSpecialProgramRulesRepository.save(gradRuleEnity));
 						
 					}catch(Exception e) {
@@ -484,8 +469,7 @@ public class ProgramManagementService {
 			}else {
 				try {
 					BeanUtils.copyProperties(sourceObject,gradRuleEnity,"createdBy","createdTimestamp");
-					restTemplate.exchange(String.format(getRequirementTypeByCodeURL,gradSpecialProgramRule.getRequirementType()), HttpMethod.GET,
-		    				new HttpEntity<>(httpHeaders), GradRequirementTypes.class).getBody();
+					webClient.get().uri(String.format(getRequirementTypeByCodeURL,gradSpecialProgramRule.getRequirementType())).headers(h -> h.setBearerAuth(accessToken)).retrieve().bodyToMono(GradRequirementTypes.class).block();
 					return gradSpecialProgramRulesTransformer.transformToDTO(gradSpecialProgramRulesRepository.save(gradRuleEnity));
 					
 				}catch(Exception e) {
@@ -548,12 +532,10 @@ public class ProgramManagementService {
 	}
 
 	public List<GradProgramRule> getAllProgramRulesList(String accessToken) {
-		HttpHeaders httpHeaders = EducGradProgramManagementApiUtils.getHeaders(accessToken);
 		List<GradProgramRule> programRuleList  = new ArrayList<GradProgramRule>();
     	programRuleList = gradProgramRulesTransformer.transformToDTO(gradProgramRulesRepository.findAll());   
     	programRuleList.forEach(pR-> {
-    		GradRequirementTypes reqType = restTemplate.exchange(String.format(getRequirementTypeByCodeURL,pR.getRequirementType()), HttpMethod.GET,
-    				new HttpEntity<>(httpHeaders), GradRequirementTypes.class).getBody();
+    		GradRequirementTypes reqType = webClient.get().uri(String.format(getRequirementTypeByCodeURL,pR.getRequirementType())).headers(h -> h.setBearerAuth(accessToken)).retrieve().bodyToMono(GradRequirementTypes.class).block();
     		pR.setRequirementTypeDesc(reqType.getDescription());
     	});
     	if(programRuleList.size() > 0) {
@@ -565,13 +547,11 @@ public class ProgramManagementService {
 	}
 	
 	public List<GradSpecialProgramRule>  getAllSpecialProgramRulesList(String accessToken) {
-		HttpHeaders httpHeaders = EducGradProgramManagementApiUtils.getHeaders(accessToken);
 		List<GradSpecialProgramRule> programRuleList  = new ArrayList<GradSpecialProgramRule>();
         programRuleList = gradSpecialProgramRulesTransformer.transformToDTO(gradSpecialProgramRulesRepository.findAll());   
     	programRuleList.forEach(pR-> {
     		GradSpecialProgram gSp = gradSpecialProgramTransformer.transformToDTO(gradSpecialProgramRepository.findById(pR.getSpecialProgramID()));
-    		GradRequirementTypes reqType = restTemplate.exchange(String.format(getRequirementTypeByCodeURL,pR.getRequirementType()), HttpMethod.GET,
-    				new HttpEntity<>(httpHeaders), GradRequirementTypes.class).getBody();
+    		GradRequirementTypes reqType = webClient.get().uri(String.format(getRequirementTypeByCodeURL,pR.getRequirementType())).headers(h -> h.setBearerAuth(accessToken)).retrieve().bodyToMono(GradRequirementTypes.class).block();
     		pR.setRequirementTypeDesc(reqType.getDescription());
     		pR.setProgramCode(gSp.getProgramCode());
     		pR.setSpecialProgramCode(gSp.getSpecialProgramCode());
