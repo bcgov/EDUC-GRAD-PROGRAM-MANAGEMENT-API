@@ -331,7 +331,11 @@ public class ProgramManagementService {
 	}
 
 	public GradProgram getSpecificProgram(String programCode) {
-		return gradProgramTransformer.transformToDTO(gradProgramRepository.findById(programCode));
+		Optional<GradProgramEntity> gradResponse = gradProgramRepository.findById(programCode); 
+		if(gradResponse.isPresent()) {
+			return gradProgramTransformer.transformToDTO(gradResponse.get());
+		}
+		return null;
 	}
 
 	public GradSpecialProgram createGradSpecialProgram(@Valid GradSpecialProgram gradSpecialProgram) {
