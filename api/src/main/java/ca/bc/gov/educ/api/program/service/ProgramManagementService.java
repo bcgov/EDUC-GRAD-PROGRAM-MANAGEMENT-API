@@ -331,7 +331,11 @@ public class ProgramManagementService {
 	}
 
 	public GradProgram getSpecificProgram(String programCode) {
-		return gradProgramTransformer.transformToDTO(gradProgramRepository.findById(programCode));
+		Optional<GradProgramEntity> gradResponse = gradProgramRepository.findById(programCode); 
+		if(gradResponse.isPresent()) {
+			return gradProgramTransformer.transformToDTO(gradResponse.get());
+		}
+		return null;
 	}
 
 	public GradSpecialProgram createGradSpecialProgram(@Valid GradSpecialProgram gradSpecialProgram) {
@@ -540,8 +544,7 @@ public class ProgramManagementService {
     	});
     	if(programRuleList.size() > 0) {
 	    	Collections.sort(programRuleList, Comparator.comparing(GradProgramRule::getProgramCode)
-	    			.thenComparing(GradProgramRule::getRuleCode)
-	    			.reversed());   
+	    			.thenComparing(GradProgramRule::getRuleCode));   
     	}
         return programRuleList;
 	}
@@ -559,8 +562,7 @@ public class ProgramManagementService {
     	if(programRuleList.size() > 0) {
 	    	Collections.sort(programRuleList, Comparator.comparing(GradSpecialProgramRule::getProgramCode)
 	    			.thenComparing(GradSpecialProgramRule::getSpecialProgramCode)
-	    			.thenComparing(GradSpecialProgramRule::getRuleCode)
-	    			.reversed());   
+	    			.thenComparing(GradSpecialProgramRule::getRuleCode));   
     	}
         return programRuleList;
 	}
