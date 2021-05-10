@@ -1,5 +1,7 @@
 package ca.bc.gov.educ.api.program;
 
+import ca.bc.gov.educ.api.program.model.dto.GradProgram;
+import ca.bc.gov.educ.api.program.model.entity.GradProgramEntity;
 import org.modelmapper.ModelMapper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -15,9 +17,6 @@ import org.springframework.security.config.annotation.web.configuration.WebSecur
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.client.RestTemplate;
 import org.springframework.web.reactive.function.client.WebClient;
-
-import ca.bc.gov.educ.api.program.model.dto.GradProgram;
-import ca.bc.gov.educ.api.program.model.entity.GradProgramEntity;
 import reactor.netty.http.client.HttpClient;
 
 @SpringBootApplication
@@ -25,51 +24,52 @@ import reactor.netty.http.client.HttpClient;
 @EnableCaching
 public class EducGradProgramManagementApiApplication {
 
-	private static Logger logger = LoggerFactory.getLogger(EducGradProgramManagementApiApplication.class);
+    private static Logger logger = LoggerFactory.getLogger(EducGradProgramManagementApiApplication.class);
 
-	public static void main(String[] args) {
-		logger.debug("########Starting API");
-		SpringApplication.run(EducGradProgramManagementApiApplication.class, args);
-		logger.debug("########Started API");
-	}
+    public static void main(String[] args) {
+        logger.debug("########Starting API");
+        SpringApplication.run(EducGradProgramManagementApiApplication.class, args);
+        logger.debug("########Started API");
+    }
 
-	@Bean
-	public ModelMapper modelMapper() {
+    @Bean
+    public ModelMapper modelMapper() {
 
-		ModelMapper modelMapper = new ModelMapper();
-		modelMapper.typeMap(GradProgramEntity.class, GradProgram.class);
-		modelMapper.typeMap(GradProgram.class, GradProgramEntity.class);
-		return modelMapper;
-	}
-	
-	@Bean
-	public WebClient webClient() {
-		HttpClient client = HttpClient.create();
-		client.warmup().block();
-		return WebClient.builder().build();
-	}
-	
-	@Bean
-	public RestTemplate restTemplate(RestTemplateBuilder builder) {
-		return builder.build();
-	}
-	
-	@Configuration
-	static
-	class WebSecurityConfiguration extends WebSecurityConfigurerAdapter {
-	  /**
-	   * Instantiates a new Web security configuration.
-	   * This makes sure that security context is propagated to async threads as well.
-	   */
-	  public WebSecurityConfiguration() {
-	    super();
-	    SecurityContextHolder.setStrategyName(SecurityContextHolder.MODE_INHERITABLETHREADLOCAL);
-	  }
-	  @Override
-	  public void configure(WebSecurity web) {
-	    web.ignoring().antMatchers("/v3/api-docs/**",
-	            "/actuator/health","/actuator/prometheus",
-	            "/swagger-ui/**", "/health");
-	  }
-	}
+        ModelMapper modelMapper = new ModelMapper();
+        modelMapper.typeMap(GradProgramEntity.class, GradProgram.class);
+        modelMapper.typeMap(GradProgram.class, GradProgramEntity.class);
+        return modelMapper;
+    }
+
+    @Bean
+    public WebClient webClient() {
+        HttpClient client = HttpClient.create();
+        client.warmup().block();
+        return WebClient.builder().build();
+    }
+
+    @Bean
+    public RestTemplate restTemplate(RestTemplateBuilder builder) {
+        return builder.build();
+    }
+
+    @Configuration
+    static
+    class WebSecurityConfiguration extends WebSecurityConfigurerAdapter {
+        /**
+         * Instantiates a new Web security configuration.
+         * This makes sure that security context is propagated to async threads as well.
+         */
+        public WebSecurityConfiguration() {
+            super();
+            SecurityContextHolder.setStrategyName(SecurityContextHolder.MODE_INHERITABLETHREADLOCAL);
+        }
+
+        @Override
+        public void configure(WebSecurity web) {
+            web.ignoring().antMatchers("/api/v1/api-docs-ui.html",
+                    "/api/v1/swagger-ui/**", "/api/v1/api-docs/**",
+                    "/actuator/health", "/actuator/prometheus", "/health");
+        }
+    }
 }
