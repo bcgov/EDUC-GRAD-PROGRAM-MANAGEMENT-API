@@ -2,6 +2,15 @@ package ca.bc.gov.educ.api.program.util;
 
 import java.util.Date;
 
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.stereotype.Component;
+
+import lombok.Getter;
+import lombok.Setter;
+
+@Component
+@Getter
+@Setter
 public class EducGradProgramManagementApiConstants {
 
     //API end-point Mapping constants
@@ -36,8 +45,6 @@ public class EducGradProgramManagementApiConstants {
     public static final String GET_ALL_LETTER_GRADE__BY_LETTER_GRADE = "/lettergrade/{letterGrade}";
     public static final String GET_ALL_SPECIFIC_PROGRAM_RULES_BY_RULE = "/programrules/{ruleCode}";
     
-    public static final String ENDPOINT_PROGRAM_TYPE_BY_CODE_URL = "${endpoint.code-api.program-type_by_code.url}";
-    public static final String ENDPOINT_REQUIREMENT_TYPE_BY_CODE_URL = "${endpoint.code-api.requirement-type_by_code.url}";
     //Default Attribute value constants
     public static final String DEFAULT_CREATED_BY = "ProgramManagementAPI";
     public static final Date DEFAULT_CREATED_TIMESTAMP = new Date();
@@ -48,4 +55,10 @@ public class EducGradProgramManagementApiConstants {
     public static final String DEFAULT_DATE_FORMAT = "yyyy-MM-dd";
     
     public static final String TRAX_DATE_FORMAT = "yyyyMM";
+    
+    @Value("${endpoint.code-api.program-type_by_code.url}")
+    private String gradProgramTypeByCode;
+    
+    @Value("${endpoint.code-api.requirement-type_by_code.url}")
+    private String gradRequirementTypeByCode;
 }
