@@ -124,7 +124,8 @@ public class ProgramManagementService {
     @Autowired
     WebClient webClient;
 
-    private static Logger logger = LoggerFactory.getLogger(ProgramManagementService.class);
+    @SuppressWarnings("unused")
+	private static Logger logger = LoggerFactory.getLogger(ProgramManagementService.class);
 
      /**
      * Get all Programs in Grad Program DTO
@@ -437,7 +438,7 @@ public class ProgramManagementService {
 		}
 	}
 
-	public int deleteGradSpecailProgramRules(UUID programRuleID) {
+	public int deleteGradSpecialProgramRules(UUID programRuleID) {
 		Optional<GradSpecialProgramRulesEntity> gradSpecialProgramRuleOptional = gradSpecialProgramRulesRepository.findById(programRuleID);
 		if(gradSpecialProgramRuleOptional.isPresent()) {
 			gradProgramRulesRepository.deleteById(programRuleID);

@@ -358,9 +358,6 @@ public class ProgramManagementServiceTest {
 	@Test(expected = GradBusinessRuleException.class)
 	public void deleteGradProgram_exception_exception() {
 		UUID ruleID=new UUID(1, 1);
-		GradProgramEntity gradProgramEntity = new GradProgramEntity();
-		gradProgramEntity.setProgramCode("ABCD");
-		gradProgramEntity.setProgramName("EFGH");
 		Mockito.when(gradProgramRulesRepository.findById(ruleID)).thenReturn(Optional.empty());
 		programManagementService.deleteGradProgramRules(ruleID);
 	}
@@ -527,5 +524,51 @@ public class ProgramManagementServiceTest {
 		String specialProgramCode = "FI";
 		Mockito.when(gradSpecialProgramRepository.findByProgramCodeAndSpecialProgramCode(programCode, specialProgramCode)).thenReturn(Optional.empty());
 		programManagementService.getSpecialProgram(programCode, specialProgramCode);
+	}
+	
+	@Test
+	public void testGetRequirementTypeByType() {
+		String typeCode="M";
+		List<GradProgramRulesEntity> gradProgramRuleList = new ArrayList<GradProgramRulesEntity>();
+		GradProgramRulesEntity ruleObj = new GradProgramRulesEntity();
+		ruleObj.setProgramCode("2018-EN");
+		ruleObj.setRuleCode("100");
+		ruleObj.setRequirementName("ABC");
+		ruleObj.setRequirementType("M");
+		gradProgramRuleList.add(ruleObj);
+		ruleObj = new GradProgramRulesEntity();
+		ruleObj.setProgramCode("2018-EN");
+		ruleObj.setRuleCode("200");
+		ruleObj.setRequirementName("ABC");
+		ruleObj.setRequirementType("M");
+		gradProgramRuleList.add(ruleObj);
+		Mockito.when(gradProgramRulesRepository.existsByRequirementTypeCode(typeCode)).thenReturn(gradProgramRuleList);
+		boolean result = programManagementService.getRequirementByRequirementType(typeCode);
+		assertEquals(true, result);
+	}
+	
+	@Test
+	public void testGetRequirementTypeByType_emptyList() {
+		String typeCode="M";
+		Mockito.when(gradProgramRulesRepository.existsByRequirementTypeCode(typeCode)).thenReturn(new ArrayList<>());
+		boolean result = programManagementService.getRequirementByRequirementType(typeCode);
+		assertEquals(false, result);
+	}
+	
+	@Test
+	public void testDeleteGradSpecialProgramRules() {
+		UUID ruleID=new UUID(1, 1);
+		GradSpecialProgramRulesEntity gradSpecialProgramRulesEntity = new GradSpecialProgramRulesEntity();
+		gradSpecialProgramRulesEntity.setRuleCode("100");
+		gradSpecialProgramRulesEntity.setSpecialProgramID(new UUID(1, 1));
+		Mockito.when(gradSpecialProgramRulesRepository.findById(ruleID)).thenReturn(Optional.of(gradSpecialProgramRulesEntity));
+		programManagementService.deleteGradSpecialProgramRules(ruleID);
+	}
+	
+	@Test(expected = GradBusinessRuleException.class)
+	public void deleteGradSpecialProgram_exception_exception() {
+		UUID ruleID=new UUID(1, 1);
+		Mockito.when(gradSpecialProgramRulesRepository.findById(ruleID)).thenReturn(Optional.empty());
+		programManagementService.deleteGradSpecialProgramRules(ruleID);
 	}
 }

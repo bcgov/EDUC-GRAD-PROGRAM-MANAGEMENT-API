@@ -23,6 +23,8 @@ import ca.bc.gov.educ.api.program.model.dto.GradProgram;
 import ca.bc.gov.educ.api.program.model.dto.GradProgramRule;
 import ca.bc.gov.educ.api.program.model.dto.GradRuleDetails;
 import ca.bc.gov.educ.api.program.model.dto.GradSpecialCase;
+import ca.bc.gov.educ.api.program.model.dto.GradSpecialProgram;
+import ca.bc.gov.educ.api.program.model.dto.GradSpecialProgramRule;
 import ca.bc.gov.educ.api.program.service.ProgramManagementService;
 import ca.bc.gov.educ.api.program.util.GradValidation;
 import ca.bc.gov.educ.api.program.util.MessageHelper;
@@ -340,5 +342,419 @@ public class ProgramManagementControllerTest {
 		Mockito.when(programManagementService.getSpecificLetterGrade(letterGrade)).thenReturn(obj);
 		programManagementController.getSpecificLetterGrade(letterGrade);
 		Mockito.verify(programManagementService).getSpecificLetterGrade(letterGrade);
+	}
+	
+	@Test
+	public void testGetRequirementByRequirementType() {
+		String typeCode="AB";
+		Mockito.when(programManagementService.getRequirementByRequirementType(typeCode)).thenReturn(true);
+		programManagementController.getRequirementByRequirementType(typeCode);
+		Mockito.verify(programManagementService).getRequirementByRequirementType(typeCode);
+	}
+	
+	@Test
+	public void testGetAllSpecialProgramsByID() {
+		String specialProgramID=new UUID(1, 1).toString();
+		GradSpecialProgram gradSpecialProgram = new GradSpecialProgram();
+		gradSpecialProgram.setProgramCode("ABCD");
+		gradSpecialProgram.setId(new UUID(1, 1));
+		gradSpecialProgram.setSpecialProgramCode("FI");
+		gradSpecialProgram.setSpecialProgramName("EFGH");
+		Mockito.when(programManagementService.getSpecialProgramByID(UUID.fromString(specialProgramID))).thenReturn(gradSpecialProgram);
+		programManagementController.getAllSpecialProgramsByID(specialProgramID);
+	}
+	
+	@Test
+	public void testGetAllSpecialPrograms() {
+		List<GradSpecialProgram> list = new ArrayList<GradSpecialProgram>();
+		GradSpecialProgram gradSpecialProgram = new GradSpecialProgram();
+		gradSpecialProgram.setProgramCode("ABCD");
+		gradSpecialProgram.setId(new UUID(1, 1));
+		gradSpecialProgram.setSpecialProgramCode("FI");
+		gradSpecialProgram.setSpecialProgramName("EFGH");
+		list.add(gradSpecialProgram);
+		gradSpecialProgram = new GradSpecialProgram();
+		gradSpecialProgram.setProgramCode("ABCD");
+		gradSpecialProgram.setId(new UUID(1, 1));
+		gradSpecialProgram.setSpecialProgramCode("FI");
+		gradSpecialProgram.setSpecialProgramName("EFGH");
+		list.add(gradSpecialProgram);
+		Mockito.when(programManagementService.getAllSpecialProgramList()).thenReturn(list);
+		programManagementController.getAllSpecialPrograms();
+	}
+	
+	@Test
+	public void testGetAllSpecialPrograms_emptyList() {
+		Mockito.when(programManagementService.getAllSpecialProgramList()).thenReturn(new ArrayList<>());
+		programManagementController.getAllSpecialPrograms();
+	}
+	
+	@Test
+	public void testGetAllSpecialProgramsByProgram() {
+		String programCode = "2018-EN";
+		List<GradSpecialProgram> list = new ArrayList<GradSpecialProgram>();
+		GradSpecialProgram gradSpecialProgram = new GradSpecialProgram();
+		gradSpecialProgram.setProgramCode("ABCD");
+		gradSpecialProgram.setId(new UUID(1, 1));
+		gradSpecialProgram.setSpecialProgramCode("FI");
+		gradSpecialProgram.setSpecialProgramName("EFGH");
+		list.add(gradSpecialProgram);
+		gradSpecialProgram = new GradSpecialProgram();
+		gradSpecialProgram.setProgramCode("ABCD");
+		gradSpecialProgram.setId(new UUID(1, 1));
+		gradSpecialProgram.setSpecialProgramCode("FI");
+		gradSpecialProgram.setSpecialProgramName("EFGH");
+		list.add(gradSpecialProgram);
+		Mockito.when(programManagementService.getAllSpecialProgramList(programCode)).thenReturn(list);
+		programManagementController.getAllSpecialPrograms(programCode);
+	}
+	
+	@Test
+	public void testGetAllSpecialProgramsByProgram_emptyList() {
+		String programCode = "2018-EN";
+		Mockito.when(programManagementService.getAllSpecialProgramList(programCode)).thenReturn(new ArrayList<>());
+		programManagementController.getAllSpecialPrograms(programCode);
+	}
+	
+	@Test
+	public void testGetSpecialProgramsByProgramCodeSpecialProgramCode() {
+		String programCode = "2018-EN";
+		String specialProgramCode="FI";
+		GradSpecialProgram gradSpecialProgram = new GradSpecialProgram();
+		gradSpecialProgram.setProgramCode("ABCD");
+		gradSpecialProgram.setId(new UUID(1, 1));
+		gradSpecialProgram.setSpecialProgramCode("FI");
+		gradSpecialProgram.setSpecialProgramName("EFGH");
+		Mockito.when(programManagementService.getSpecialProgram(programCode,specialProgramCode)).thenReturn(gradSpecialProgram);
+		programManagementController.getSpecialPrograms(programCode,specialProgramCode);
+	}
+	
+	@Test
+	public void testCreateGradSpecialPrograms() {
+		GradSpecialProgram obj = new GradSpecialProgram();
+		obj.setProgramCode("AB");
+		obj.setId(new UUID(1, 1));
+		obj.setSpecialProgramCode("FI");
+		obj.setSpecialProgramName("French Immersion");
+		Mockito.when(programManagementService.createGradSpecialProgram(obj)).thenReturn(obj);
+		programManagementController.createGradSpecialPrograms(obj);
+	}
+	
+	@Test
+	public void testCreateGradSpecialPrograms_error() {
+		GradSpecialProgram obj = new GradSpecialProgram();
+		obj.setProgramCode("AB");
+		obj.setId(new UUID(1, 1));
+		obj.setSpecialProgramName("French Immersion");
+		Mockito.when(programManagementService.createGradSpecialProgram(obj)).thenReturn(obj);
+		programManagementController.createGradSpecialPrograms(obj);
+	}
+	
+	@Test
+	public void testUpdateGradSpecialPrograms() {
+		GradSpecialProgram obj = new GradSpecialProgram();
+		obj.setProgramCode("AB");
+		obj.setId(new UUID(1, 1));
+		obj.setSpecialProgramCode("FI");
+		obj.setSpecialProgramName("French Immersion");
+		Mockito.when(programManagementService.updateGradSpecialPrograms(obj)).thenReturn(obj);
+		programManagementController.updateGradSpecialPrograms(obj);
+	}
+	
+	@Test
+	public void testUpdateGradSpecialPrograms_error() {
+		GradSpecialProgram obj = new GradSpecialProgram();
+		obj.setProgramCode("AB");
+		obj.setId(new UUID(1, 1));
+		obj.setSpecialProgramName("French Immersion");
+		Mockito.when(programManagementService.updateGradSpecialPrograms(obj)).thenReturn(obj);
+		programManagementController.updateGradSpecialPrograms(obj);
+	}
+	
+	@Test
+	public void testDeleteSpecialPrograms() {
+		String specialProgramID = new UUID(1, 1).toString();
+		Mockito.when(programManagementService.deleteGradSpecialPrograms(UUID.fromString(specialProgramID))).thenReturn(1);
+		programManagementController.deleteGradSpecialPrograms(specialProgramID);
+	}
+	
+	@Test
+	public void testGetSpecialProgramRules() {
+		String specialProgramID = new UUID(1, 1).toString();
+		String requirementType = "M";
+		
+		Authentication authentication = Mockito.mock(Authentication.class);
+		OAuth2AuthenticationDetails details = Mockito.mock(OAuth2AuthenticationDetails.class);
+		// Mockito.whens() for your authorization object
+		SecurityContext securityContext = Mockito.mock(SecurityContext.class);
+		Mockito.when(securityContext.getAuthentication()).thenReturn(authentication);
+		Mockito.when(authentication.getDetails()).thenReturn(details);
+		SecurityContextHolder.setContext(securityContext);
+		
+		List<GradSpecialProgramRule> list = new ArrayList<>();
+		GradSpecialProgramRule gradSpecialProgramRule = new GradSpecialProgramRule();
+    	gradSpecialProgramRule.setProgramCode("2018-EN");
+    	gradSpecialProgramRule.setRuleCode("100");
+    	gradSpecialProgramRule.setRequirementType("M");
+    	list.add(gradSpecialProgramRule);
+    	Mockito.when(programManagementService.getAllSpecialProgramRuleList(UUID.fromString(specialProgramID),requirementType,null)).thenReturn(list);
+		programManagementController.getAllSpecialProgramRules(specialProgramID,requirementType);
+	}
+	
+	@Test
+	public void testGetSpecialProgramRules_emptyList() {
+		String specialProgramID = new UUID(1, 1).toString();
+		String requirementType = "M";
+		
+		Authentication authentication = Mockito.mock(Authentication.class);
+		OAuth2AuthenticationDetails details = Mockito.mock(OAuth2AuthenticationDetails.class);
+		// Mockito.whens() for your authorization object
+		SecurityContext securityContext = Mockito.mock(SecurityContext.class);
+		Mockito.when(securityContext.getAuthentication()).thenReturn(authentication);
+		Mockito.when(authentication.getDetails()).thenReturn(details);
+		SecurityContextHolder.setContext(securityContext);
+		
+    	Mockito.when(programManagementService.getAllSpecialProgramRuleList(UUID.fromString(specialProgramID),requirementType,null)).thenReturn(new ArrayList<>());
+		programManagementController.getAllSpecialProgramRules(specialProgramID,requirementType);
+	}
+	
+	@Test
+	public void testCreateGradSpecialProgramRules() {
+		Authentication authentication = Mockito.mock(Authentication.class);
+		OAuth2AuthenticationDetails details = Mockito.mock(OAuth2AuthenticationDetails.class);
+		// Mockito.whens() for your authorization object
+		SecurityContext securityContext = Mockito.mock(SecurityContext.class);
+		Mockito.when(securityContext.getAuthentication()).thenReturn(authentication);
+		Mockito.when(authentication.getDetails()).thenReturn(details);
+		SecurityContextHolder.setContext(securityContext);
+		
+		GradSpecialProgramRule obj = new GradSpecialProgramRule();
+		obj.setProgramCode("AB");
+		obj.setRuleCode("100");
+		obj.setRequirementType("M");
+		obj.setRequirementName("Match");
+		Mockito.when(programManagementService.createGradSpecialProgramRules(obj,null)).thenReturn(obj);
+		programManagementController.createGradSpecialProgramRules(obj);
+	}
+	
+	@Test
+	public void testCreateGradSpecialProgramRules_error() {
+		Authentication authentication = Mockito.mock(Authentication.class);
+		OAuth2AuthenticationDetails details = Mockito.mock(OAuth2AuthenticationDetails.class);
+		// Mockito.whens() for your authorization object
+		SecurityContext securityContext = Mockito.mock(SecurityContext.class);
+		Mockito.when(securityContext.getAuthentication()).thenReturn(authentication);
+		Mockito.when(authentication.getDetails()).thenReturn(details);
+		SecurityContextHolder.setContext(securityContext);
+		
+		GradSpecialProgramRule obj = new GradSpecialProgramRule();
+		obj.setProgramCode("AB");
+		obj.setRuleCode("100");
+		obj.setRequirementType("M");
+		Mockito.when(programManagementService.createGradSpecialProgramRules(obj,null)).thenReturn(obj);
+		programManagementController.createGradSpecialProgramRules(obj);
+	}
+	
+	@Test
+	public void testUpdateGradSpecialProgramRules() {
+		Authentication authentication = Mockito.mock(Authentication.class);
+		OAuth2AuthenticationDetails details = Mockito.mock(OAuth2AuthenticationDetails.class);
+		// Mockito.whens() for your authorization object
+		SecurityContext securityContext = Mockito.mock(SecurityContext.class);
+		Mockito.when(securityContext.getAuthentication()).thenReturn(authentication);
+		Mockito.when(authentication.getDetails()).thenReturn(details);
+		SecurityContextHolder.setContext(securityContext);
+		
+		GradSpecialProgramRule obj = new GradSpecialProgramRule();
+		obj.setProgramCode("AB");
+		obj.setRuleCode("100");
+		obj.setRequirementType("M");
+		obj.setRequirementName("Match");
+		Mockito.when(programManagementService.updateGradSpecialProgramRules(obj, null)).thenReturn(obj);
+		programManagementController.updateGradSpecialProgramRules(obj);
+	}
+	
+	@Test
+	public void testUpdateGradSpecialProgramRules_error() {
+		Authentication authentication = Mockito.mock(Authentication.class);
+		OAuth2AuthenticationDetails details = Mockito.mock(OAuth2AuthenticationDetails.class);
+		// Mockito.whens() for your authorization object
+		SecurityContext securityContext = Mockito.mock(SecurityContext.class);
+		Mockito.when(securityContext.getAuthentication()).thenReturn(authentication);
+		Mockito.when(authentication.getDetails()).thenReturn(details);
+		SecurityContextHolder.setContext(securityContext);
+		
+		GradSpecialProgramRule obj = new GradSpecialProgramRule();
+		obj.setProgramCode("AB");
+		obj.setRuleCode("100");
+		obj.setRequirementType("M");
+		Mockito.when(programManagementService.updateGradSpecialProgramRules(obj, null)).thenReturn(obj);
+		programManagementController.updateGradSpecialProgramRules(obj);
+	}
+	
+	@Test
+	public void testDeleteGradSpecialProgramRules() {
+		UUID ruleID = new UUID(1, 1);
+		Mockito.when(programManagementService.deleteGradSpecialProgramRules(ruleID)).thenReturn(1);
+		programManagementController.deleteGradSpecialProgramRules(ruleID.toString());		
+		
+	}
+	
+	@Test
+	public void testGetAllSpecialProgramRules() {
+		List<GradSpecialProgramRule> list = new ArrayList<>();
+		GradSpecialProgramRule gradSpecialProgramRule = new GradSpecialProgramRule();
+    	gradSpecialProgramRule.setProgramCode("2018-EN");
+    	gradSpecialProgramRule.setRuleCode("100");
+    	gradSpecialProgramRule.setRequirementType("M");
+    	list.add(gradSpecialProgramRule);
+    	
+    	Authentication authentication = Mockito.mock(Authentication.class);
+		OAuth2AuthenticationDetails details = Mockito.mock(OAuth2AuthenticationDetails.class);
+		// Mockito.whens() for your authorization object
+		SecurityContext securityContext = Mockito.mock(SecurityContext.class);
+		Mockito.when(securityContext.getAuthentication()).thenReturn(authentication);
+		Mockito.when(authentication.getDetails()).thenReturn(details);
+		SecurityContextHolder.setContext(securityContext);
+		
+		Mockito.when(programManagementService.getAllSpecialProgramRulesList(null)).thenReturn(list);
+		programManagementController.getAllSpecialProgramRules();
+	}
+	
+	@Test
+	public void testGetAllSpecialProgramRules_emptyList() {
+    	
+    	Authentication authentication = Mockito.mock(Authentication.class);
+		OAuth2AuthenticationDetails details = Mockito.mock(OAuth2AuthenticationDetails.class);
+		// Mockito.whens() for your authorization object
+		SecurityContext securityContext = Mockito.mock(SecurityContext.class);
+		Mockito.when(securityContext.getAuthentication()).thenReturn(authentication);
+		Mockito.when(authentication.getDetails()).thenReturn(details);
+		SecurityContextHolder.setContext(securityContext);
+		
+		Mockito.when(programManagementService.getAllSpecialProgramRulesList(null)).thenReturn(new ArrayList<>());
+		programManagementController.getAllSpecialProgramRules();
+	}
+	
+	@Test
+	public void getAllProgramsRules() {
+		List<GradProgramRule> list = new ArrayList<>();
+		GradProgramRule gradProgramRule = new GradProgramRule();
+    	gradProgramRule.setProgramCode("2018-EN");
+    	gradProgramRule.setRuleCode("100");
+    	gradProgramRule.setRequirementType("M");
+    	list.add(gradProgramRule);
+    	
+    	Authentication authentication = Mockito.mock(Authentication.class);
+		OAuth2AuthenticationDetails details = Mockito.mock(OAuth2AuthenticationDetails.class);
+		// Mockito.whens() for your authorization object
+		SecurityContext securityContext = Mockito.mock(SecurityContext.class);
+		Mockito.when(securityContext.getAuthentication()).thenReturn(authentication);
+		Mockito.when(authentication.getDetails()).thenReturn(details);
+		SecurityContextHolder.setContext(securityContext);
+		
+		Mockito.when(programManagementService.getAllProgramRulesList(null)).thenReturn(list);
+		programManagementController.getAllProgramsRules();
+	}
+	
+	@Test
+	public void testGetAllProgramsRules_emptyList() {
+    	
+    	Authentication authentication = Mockito.mock(Authentication.class);
+		OAuth2AuthenticationDetails details = Mockito.mock(OAuth2AuthenticationDetails.class);
+		// Mockito.whens() for your authorization object
+		SecurityContext securityContext = Mockito.mock(SecurityContext.class);
+		Mockito.when(securityContext.getAuthentication()).thenReturn(authentication);
+		Mockito.when(authentication.getDetails()).thenReturn(details);
+		SecurityContextHolder.setContext(securityContext);
+		
+		Mockito.when(programManagementService.getAllProgramRulesList(null)).thenReturn(new ArrayList<>());
+		programManagementController.getAllProgramsRules();
+	}
+	
+	@Test
+	public void testGetSpecialProgramRulesByProgramCodeAndSpecialProgramCode() {
+		String specialProgramCode= "FI";
+		String requirementType = "M";
+		String programCode="2018-EN";
+		
+		Authentication authentication = Mockito.mock(Authentication.class);
+		OAuth2AuthenticationDetails details = Mockito.mock(OAuth2AuthenticationDetails.class);
+		// Mockito.whens() for your authorization object
+		SecurityContext securityContext = Mockito.mock(SecurityContext.class);
+		Mockito.when(securityContext.getAuthentication()).thenReturn(authentication);
+		Mockito.when(authentication.getDetails()).thenReturn(details);
+		SecurityContextHolder.setContext(securityContext);
+		
+		List<GradSpecialProgramRule> list = new ArrayList<>();
+		GradSpecialProgramRule gradSpecialProgramRule = new GradSpecialProgramRule();
+    	gradSpecialProgramRule.setProgramCode("2018-EN");
+    	gradSpecialProgramRule.setRuleCode("100");
+    	gradSpecialProgramRule.setRequirementType("M");
+    	list.add(gradSpecialProgramRule);
+    	
+		Mockito.when(programManagementService.getSpecialProgramRulesByProgramCodeAndSpecialProgramCode(programCode,specialProgramCode,requirementType,null)).thenReturn(list);
+		programManagementController.getSpecialProgramRulesByProgramCodeAndSpecialProgramCode(programCode, specialProgramCode,requirementType);
+	}
+	
+	@Test
+	public void testGetSpecialProgramRulesByProgramCodeAndSpecialProgramCode_emptyList() {
+		String specialProgramCode= "FI";
+		String requirementType = "M";
+		String programCode="2018-EN";
+		
+		Authentication authentication = Mockito.mock(Authentication.class);
+		OAuth2AuthenticationDetails details = Mockito.mock(OAuth2AuthenticationDetails.class);
+		// Mockito.whens() for your authorization object
+		SecurityContext securityContext = Mockito.mock(SecurityContext.class);
+		Mockito.when(securityContext.getAuthentication()).thenReturn(authentication);
+		Mockito.when(authentication.getDetails()).thenReturn(details);
+		SecurityContextHolder.setContext(securityContext);
+		
+		
+		Mockito.when(programManagementService.getSpecialProgramRulesByProgramCodeAndSpecialProgramCode(programCode,specialProgramCode,requirementType,null)).thenReturn(new ArrayList<>());
+		programManagementController.getSpecialProgramRulesByProgramCodeAndSpecialProgramCode(programCode, specialProgramCode,requirementType);
+	}
+	
+	@Test
+	public void testGetSpecialProgramRulesByProgramCodeAndSpecialProgramCode_withoutRequirementType() {
+		String specialProgramCode= "FI";
+		String programCode="2018-EN";
+		
+		Authentication authentication = Mockito.mock(Authentication.class);
+		OAuth2AuthenticationDetails details = Mockito.mock(OAuth2AuthenticationDetails.class);
+		// Mockito.whens() for your authorization object
+		SecurityContext securityContext = Mockito.mock(SecurityContext.class);
+		Mockito.when(securityContext.getAuthentication()).thenReturn(authentication);
+		Mockito.when(authentication.getDetails()).thenReturn(details);
+		SecurityContextHolder.setContext(securityContext);
+		
+		List<GradSpecialProgramRule> list = new ArrayList<>();
+		GradSpecialProgramRule gradSpecialProgramRule = new GradSpecialProgramRule();
+    	gradSpecialProgramRule.setProgramCode("2018-EN");
+    	gradSpecialProgramRule.setRuleCode("100");
+    	gradSpecialProgramRule.setRequirementType("M");
+    	list.add(gradSpecialProgramRule);
+    	
+		Mockito.when(programManagementService.getSpecialProgramRulesByProgramCodeAndSpecialProgramCode(programCode,specialProgramCode,null,null)).thenReturn(list);
+		programManagementController.getSpecialProgramRulesByProgramCodeAndSpecialProgramCode(programCode, specialProgramCode);
+	}
+	
+	@Test
+	public void testGetSpecialProgramRulesByProgramCodeAndSpecialProgramCode_withoutRequirementType_emptyList() {
+		String specialProgramCode= "FI";
+		String programCode="2018-EN";
+		
+		Authentication authentication = Mockito.mock(Authentication.class);
+		OAuth2AuthenticationDetails details = Mockito.mock(OAuth2AuthenticationDetails.class);
+		// Mockito.whens() for your authorization object
+		SecurityContext securityContext = Mockito.mock(SecurityContext.class);
+		Mockito.when(securityContext.getAuthentication()).thenReturn(authentication);
+		Mockito.when(authentication.getDetails()).thenReturn(details);
+		SecurityContextHolder.setContext(securityContext);
+		
+		
+		Mockito.when(programManagementService.getSpecialProgramRulesByProgramCodeAndSpecialProgramCode(programCode,specialProgramCode,null,null)).thenReturn(new ArrayList<>());
+		programManagementController.getSpecialProgramRulesByProgramCodeAndSpecialProgramCode(programCode, specialProgramCode);
 	}
 }
