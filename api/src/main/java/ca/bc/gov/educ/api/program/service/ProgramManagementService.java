@@ -29,8 +29,10 @@ import ca.bc.gov.educ.api.program.model.dto.GradRuleDetails;
 import ca.bc.gov.educ.api.program.model.dto.GradSpecialCase;
 import ca.bc.gov.educ.api.program.model.dto.GradSpecialProgram;
 import ca.bc.gov.educ.api.program.model.dto.GradSpecialProgramRule;
+import ca.bc.gov.educ.api.program.model.entity.GradLetterGradeEntity;
 import ca.bc.gov.educ.api.program.model.entity.GradProgramEntity;
 import ca.bc.gov.educ.api.program.model.entity.GradProgramRulesEntity;
+import ca.bc.gov.educ.api.program.model.entity.GradSpecialCaseEntity;
 import ca.bc.gov.educ.api.program.model.entity.GradSpecialProgramEntity;
 import ca.bc.gov.educ.api.program.model.entity.GradSpecialProgramRulesEntity;
 import ca.bc.gov.educ.api.program.model.transformer.GradLetterGradeTransformer;
@@ -111,7 +113,6 @@ public class ProgramManagementService {
     
     
     
-    private static final String EXCEPTION_MSG = "Exception: %s";
 	private static final String CREATED_BY="createdBy";
 	private static final String CREATED_TIMESTAMP="createdTimestamp";
 	private static final String CREATE="create";
@@ -136,20 +137,17 @@ public class ProgramManagementService {
     }
     
 	public List<GradProgramRule> getAllProgramRuleList(String programCode, String requirementType,String accessToken) {
-		List<GradProgramRule> programRuleList  = new ArrayList<>();
-        try {
-        	if(StringUtils.isNotBlank(requirementType)) {
-        		webClient.get().uri(String.format(educGradProgramManagementApiConstants.getGradRequirementTypeByCode(),requirementType)).headers(h -> h.setBearerAuth(accessToken)).retrieve().bodyToMono(GradRequirementTypes.class).block();
-        	}
-        	programRuleList = gradProgramRulesTransformer.transformToDTO(gradProgramRulesRepository.findByProgramCodeAndRequirementType(programCode,requirementType));   
-        	programRuleList.forEach(pR-> {
-        		GradRequirementTypes reqType = webClient.get().uri(String.format(educGradProgramManagementApiConstants.getGradRequirementTypeByCode(),pR.getRequirementType())).headers(h -> h.setBearerAuth(accessToken)).retrieve().bodyToMono(GradRequirementTypes.class).block();
-        		pR.setRequirementTypeDesc(reqType.getDescription());
-        	});
-        } catch (Exception e) {
-            logger.debug(EXCEPTION_MSG + e.getMessage());
-            validation.addErrorAndStop(String.format(errorStringRequirementTypeInvalid,requirementType));
-        }
+		if(StringUtils.isNotBlank(requirementType)) {
+			GradRequirementTypes gradReqType = webClient.get().uri(String.format(educGradProgramManagementApiConstants.getGradRequirementTypeByCode(),requirementType)).headers(h -> h.setBearerAuth(accessToken)).retrieve().bodyToMono(GradRequirementTypes.class).block();
+			if(gradReqType == null) {
+				validation.addErrorAndStop(String.format(errorStringRequirementTypeInvalid,requirementType));
+	    	}
+	    }
+      	List<GradProgramRule> programRuleList  = gradProgramRulesTransformer.transformToDTO(gradProgramRulesRepository.findByProgramCodeAndRequirementType(programCode,requirementType));   
+    	programRuleList.forEach(pR-> {
+    		GradRequirementTypes reqType = webClient.get().uri(String.format(educGradProgramManagementApiConstants.getGradRequirementTypeByCode(),pR.getRequirementType())).headers(h -> h.setBearerAuth(accessToken)).retrieve().bodyToMono(GradRequirementTypes.class).block();
+    		pR.setRequirementTypeDesc(reqType.getDescription());
+    	});       
         return programRuleList;
 	}
 	
@@ -158,7 +156,11 @@ public class ProgramManagementService {
 	    }
 
 	public GradSpecialCase getSpecificSpecialCase(String specialCode) {
-		return specialCaseTransformer.transformToDTO(gradSpecialCaseRepository.findById(specialCode));
+		Optional<GradSpecialCaseEntity> gradResponse =gradSpecialCaseRepository.findById(specialCode); 
+		if(gradResponse.isPresent()) {
+			return specialCaseTransformer.transformToDTO(gradResponse.get());
+		}
+		return null;
 	}
 
 	public List<GradRuleDetails> getSpecificRuleDetails(String ruleCode) {
@@ -193,7 +195,11 @@ public class ProgramManagementService {
 	}
 
 	public GradLetterGrade getSpecificLetterGrade(String letterGrade) {
-		return gradLetterGradeTransformer.transformToDTO(gradLetterGradeRepository.findById(letterGrade));
+		Optional<GradLetterGradeEntity> gradResponse =gradLetterGradeRepository.findById(letterGrade); 
+		if(gradResponse.isPresent()) {
+			return gradLetterGradeTransformer.transformToDTO(gradResponse.get());
+		}
+		return null;
 	}
 
 	public GradProgram createGradProgram(GradProgram gradProgram) {
@@ -369,31 +375,21 @@ public class ProgramManagementService {
 	}
 
 	public List<GradSpecialProgram> getAllSpecialProgramList(String programCode) {
-		List<GradSpecialProgram> programList  = new ArrayList<>();
-        try {
-        	programList = gradSpecialProgramTransformer.transformToDTO(gradSpecialProgramRepository.findByProgramCode(programCode));            
-        } catch (Exception e) {
-            logger.debug(EXCEPTION_MSG + e.getMessage());
-        }
-
-        return programList;
+		return gradSpecialProgramTransformer.transformToDTO(gradSpecialProgramRepository.findByProgramCode(programCode));
 	}
 	
 	public List<GradSpecialProgramRule>  getAllSpecialProgramRuleList(UUID specialProgramID, String requirementType,String accessToken) {
-		List<GradSpecialProgramRule> programRuleList  = new ArrayList<>();
-        try {
-        	if(StringUtils.isNotBlank(requirementType)) {
-        		webClient.get().uri(String.format(educGradProgramManagementApiConstants.getGradRequirementTypeByCode(),requirementType)).headers(h -> h.setBearerAuth(accessToken)).retrieve().bodyToMono(GradRequirementTypes.class).block();
-        	}
-        	programRuleList = gradSpecialProgramRulesTransformer.transformToDTO(gradSpecialProgramRulesRepository.findBySpecialProgramIDAndRequirementType(specialProgramID,requirementType));   
-        	programRuleList.forEach(pR-> {
-        		GradRequirementTypes reqType = webClient.get().uri(String.format(educGradProgramManagementApiConstants.getGradRequirementTypeByCode(),pR.getRequirementType())).headers(h -> h.setBearerAuth(accessToken)).retrieve().bodyToMono(GradRequirementTypes.class).block();
-        		pR.setRequirementTypeDesc(reqType.getDescription());
-        	});
-        } catch (Exception e) {
-            logger.debug(EXCEPTION_MSG + e.getMessage());
-            validation.addErrorAndStop(String.format(errorStringRequirementTypeInvalid,requirementType));
+		if(StringUtils.isNotBlank(requirementType)) {
+    		GradRequirementTypes gradReqType = webClient.get().uri(String.format(educGradProgramManagementApiConstants.getGradRequirementTypeByCode(),requirementType)).headers(h -> h.setBearerAuth(accessToken)).retrieve().bodyToMono(GradRequirementTypes.class).block();
+			if(gradReqType == null) {
+				validation.addErrorAndStop(String.format(errorStringRequirementTypeInvalid,requirementType));
+	    	}
         }
+        List<GradSpecialProgramRule> programRuleList = gradSpecialProgramRulesTransformer.transformToDTO(gradSpecialProgramRulesRepository.findBySpecialProgramIDAndRequirementType(specialProgramID,requirementType));   
+    	programRuleList.forEach(pR-> {
+    		GradRequirementTypes reqType = webClient.get().uri(String.format(educGradProgramManagementApiConstants.getGradRequirementTypeByCode(),pR.getRequirementType())).headers(h -> h.setBearerAuth(accessToken)).retrieve().bodyToMono(GradRequirementTypes.class).block();
+    		pR.setRequirementTypeDesc(reqType.getDescription());
+    	});
         return programRuleList;
 	}
 
@@ -453,14 +449,7 @@ public class ProgramManagementService {
 	}
 
 	public List<GradSpecialProgram> getAllSpecialProgramList() {
-		List<GradSpecialProgram> programList  = new ArrayList<>();
-        try {
-        	programList = gradSpecialProgramTransformer.transformToDTO(gradSpecialProgramRepository.findAll());            
-        } catch (Exception e) {
-            logger.debug(EXCEPTION_MSG + e.getMessage());
-        }
-
-        return programList;
+		return gradSpecialProgramTransformer.transformToDTO(gradSpecialProgramRepository.findAll());      
 	}
 
 	public GradSpecialProgram getSpecialProgramByID(UUID specialProgramID) {
@@ -479,9 +468,9 @@ public class ProgramManagementService {
 	}
 
 	public GradSpecialProgram getSpecialProgram(String programCode, String specialProgramCode) {
-		GradSpecialProgram specialProgram = gradSpecialProgramTransformer.transformToDTO(gradSpecialProgramRepository.findByProgramCodeAndSpecialProgramCode(programCode, specialProgramCode));
-		if(specialProgram != null) {
-			return specialProgram;
+		Optional<GradSpecialProgramEntity> optionalRec = gradSpecialProgramRepository.findByProgramCodeAndSpecialProgramCode(programCode, specialProgramCode);
+		if(optionalRec.isPresent()) {
+			return gradSpecialProgramTransformer.transformToDTO(optionalRec.get());
 		}else {
 			validation.addErrorAndStop(String.format("Special Program Code [%s] and Program Code [%s] combination does not exist",specialProgramCode,programCode));
 			return null;

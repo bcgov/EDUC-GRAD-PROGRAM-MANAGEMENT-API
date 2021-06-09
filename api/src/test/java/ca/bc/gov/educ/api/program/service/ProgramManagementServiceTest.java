@@ -462,4 +462,70 @@ public class ProgramManagementServiceTest {
 		programManagementService.deleteGradSpecialPrograms(ruleID);
 	}
 	
+	@Test
+	public void testGetAllSpecialProgramList_withProgramCode() {
+		String programCode = "2018-EN";
+		List<GradSpecialProgramEntity> gradProgramList = new ArrayList<>();
+		GradSpecialProgramEntity obj = new GradSpecialProgramEntity();
+		obj.setId(new UUID(1, 1));;
+		obj.setSpecialProgramName("2018 Graduation Program");
+		obj.setSpecialProgramCode("FI");
+		gradProgramList.add(obj);
+		obj = new GradSpecialProgramEntity();
+		obj.setId(new UUID(1, 1));;
+		obj.setSpecialProgramName("2018 Graduation Program");
+		obj.setSpecialProgramCode("FI");
+		gradProgramList.add(obj);
+		Mockito.when(gradSpecialProgramRepository.findAll()).thenReturn(gradProgramList);
+		programManagementService.getAllSpecialProgramList(programCode);
+	}
+	
+	@Test
+	public void testGetAllSpecialProgramList() {
+		List<GradSpecialProgramEntity> gradProgramList = new ArrayList<>();
+		GradSpecialProgramEntity obj = new GradSpecialProgramEntity();
+		obj.setId(new UUID(1, 1));;
+		obj.setSpecialProgramName("2018 Graduation Program");
+		obj.setSpecialProgramCode("FI");
+		gradProgramList.add(obj);
+		obj = new GradSpecialProgramEntity();
+		obj.setId(new UUID(1, 1));;
+		obj.setSpecialProgramName("2018 Graduation Program");
+		obj.setSpecialProgramCode("FI");
+		gradProgramList.add(obj);
+		Mockito.when(gradSpecialProgramRepository.findAll()).thenReturn(gradProgramList);
+		programManagementService.getAllSpecialProgramList();
+	}
+	
+	@Test
+	public void testGetSpecialProgramByID() {
+		UUID specialProgramID = new UUID(1, 1);
+		GradSpecialProgramEntity obj = new GradSpecialProgramEntity();
+		obj.setId(new UUID(1, 1));;
+		obj.setSpecialProgramName("2018 Graduation Program");
+		obj.setSpecialProgramCode("FI");
+		Mockito.when(gradSpecialProgramRepository.findById(specialProgramID)).thenReturn(Optional.of(obj));
+		programManagementService.getSpecialProgramByID(specialProgramID);
+	}	
+	
+	@Test
+	public void testGetSpecialProgram() {
+		String programCode = "2018-EN";
+		String specialProgramCode = "FI";
+		GradSpecialProgramEntity obj = new GradSpecialProgramEntity();
+		obj.setId(new UUID(1, 1));
+		obj.setProgramCode("2018-EN");
+		obj.setSpecialProgramName("2018 Graduation Program");
+		obj.setSpecialProgramCode("FI");        
+		Mockito.when(gradSpecialProgramRepository.findByProgramCodeAndSpecialProgramCode(programCode, specialProgramCode)).thenReturn(Optional.of(obj));
+		programManagementService.getSpecialProgram(programCode, specialProgramCode);
+	}
+	
+	@Test(expected = GradBusinessRuleException.class)
+	public void testGetSpecialProgram_exception() {
+		String programCode = "2018-EN";
+		String specialProgramCode = "FI";
+		Mockito.when(gradSpecialProgramRepository.findByProgramCodeAndSpecialProgramCode(programCode, specialProgramCode)).thenReturn(Optional.empty());
+		programManagementService.getSpecialProgram(programCode, specialProgramCode);
+	}
 }

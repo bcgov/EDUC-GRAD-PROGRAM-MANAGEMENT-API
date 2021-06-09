@@ -165,7 +165,7 @@ public class WebClientTest {
     @Test(expected = GradBusinessRuleException.class)
     public void testGetAllProgramRuleList_requirementTypeBlank_returnsError() {
     	String programCode = "2018-EN"; 
-    	String requirementType = null;
+    	String requirementType = "M";
     	GradRequirementTypes reqType = new GradRequirementTypes();
     	reqType.setCode("M");
     	reqType.setDescription("Match");
@@ -174,7 +174,7 @@ public class WebClientTest {
         when(this.requestHeadersMock.headers(any(Consumer.class))).thenReturn(this.requestHeadersMock);
         when(this.requestHeadersMock.retrieve()).thenReturn(this.responseMock);
         when(this.responseMock.bodyToMono(GradRequirementTypes.class)).thenReturn(monoResponse);
-        when(this.monoResponse.block()).thenReturn(reqType); 
+        when(this.monoResponse.block()).thenReturn(null); 
         
         final List<GradProgramRulesEntity> gradProgramRuleList = new ArrayList<>();
         final GradProgramRulesEntity ruleEntity = new GradProgramRulesEntity();
@@ -550,5 +550,143 @@ public class WebClientTest {
     	programManagementService.updateGradSpecialProgramRules(gradSpecialProgramRule, "accessToken");
 	}
     
+    @Test
+	public void testGetSpecialProgramRulesByProgramCodeAndSpecialProgramCode() {
+		String programCode = "2018-EN";
+		String specialProgramCode = "FI";
+		String requirementType="M";
+		GradSpecialProgramEntity obj = new GradSpecialProgramEntity();
+		obj.setId(new UUID(1, 1));
+		obj.setProgramCode("2018-EN");
+		obj.setSpecialProgramName("2018 Graduation Program");
+		obj.setSpecialProgramCode("FI");
+		
+		List<GradSpecialProgramRulesEntity> gradProgramRuleList = new ArrayList<GradSpecialProgramRulesEntity>();
+		GradSpecialProgramRulesEntity ruleObj = new GradSpecialProgramRulesEntity();
+		ruleObj.setSpecialProgramID(new UUID(1, 1));
+		ruleObj.setRuleCode("100");
+		ruleObj.setRequirementName("ABC");
+		ruleObj.setRequirementType("M");
+		gradProgramRuleList.add(ruleObj);
+		ruleObj = new GradSpecialProgramRulesEntity();
+		ruleObj.setSpecialProgramID(new UUID(2, 2));
+		ruleObj.setRuleCode("100");
+		ruleObj.setRequirementName("ABC");
+		ruleObj.setRequirementType("M");
+		gradProgramRuleList.add(ruleObj);
+		
+		GradRequirementTypes reqType = new GradRequirementTypes();
+    	reqType.setCode("M");
+    	reqType.setDescription("Match");
+    	when(this.webClient.get()).thenReturn(this.requestHeadersUriMock);
+    	when(this.requestHeadersUriMock.uri(String.format(constants.getGradRequirementTypeByCode(), requirementType))).thenReturn(this.requestHeadersMock);
+        when(this.requestHeadersMock.headers(any(Consumer.class))).thenReturn(this.requestHeadersMock);
+        when(this.requestHeadersMock.retrieve()).thenReturn(this.responseMock);
+        when(this.responseMock.bodyToMono(GradRequirementTypes.class)).thenReturn(monoResponse);
+        when(this.monoResponse.block()).thenReturn(reqType); 
+        
+        
+		Mockito.when(gradSpecialProgramRepository.findByProgramCodeAndSpecialProgramCode(programCode, specialProgramCode)).thenReturn(Optional.of(obj));
+		Mockito.when(gradSpecialProgramRulesRepository.findBySpecialProgramIDAndRequirementType(obj.getId(),requirementType)).thenReturn(gradProgramRuleList);
+		programManagementService.getSpecialProgramRulesByProgramCodeAndSpecialProgramCode(programCode,specialProgramCode,requirementType,"accessToken");
+		
+	}
+    
+    @Test(expected = GradBusinessRuleException.class)
+	public void testGetSpecialProgramRulesByProgramCodeAndSpecialProgramCode_exception() {
+		String programCode = "2018-EN";
+		String specialProgramCode = "FI";
+		String requirementType="M";
+		GradSpecialProgramEntity obj = new GradSpecialProgramEntity();
+		obj.setId(new UUID(1, 1));
+		obj.setProgramCode("2018-EN");
+		obj.setSpecialProgramName("2018 Graduation Program");
+		obj.setSpecialProgramCode("FI");        
+        
+		Mockito.when(gradSpecialProgramRepository.findByProgramCodeAndSpecialProgramCode(programCode, specialProgramCode)).thenReturn(Optional.empty());
+		programManagementService.getSpecialProgramRulesByProgramCodeAndSpecialProgramCode(programCode,specialProgramCode,requirementType,"accessToken");
+		
+	}
+    
+    @Test
+    public void testGetAllProgramRulesList() {
+    	String requirementType="M";
+    	List<GradProgramRulesEntity> gradProgramRuleList = new ArrayList<GradProgramRulesEntity>();
+		GradProgramRulesEntity ruleObj = new GradProgramRulesEntity();
+		ruleObj.setProgramCode("2018-EN");
+		ruleObj.setRuleCode("100");
+		ruleObj.setRequirementName("ABC");
+		ruleObj.setRequirementType("M");
+		gradProgramRuleList.add(ruleObj);
+		ruleObj = new GradProgramRulesEntity();
+		ruleObj.setProgramCode("2018-EN");
+		ruleObj.setRuleCode("200");
+		ruleObj.setRequirementName("ABC");
+		ruleObj.setRequirementType("M");
+		gradProgramRuleList.add(ruleObj);
+		
+		GradRequirementTypes reqType = new GradRequirementTypes();
+    	reqType.setCode("M");
+    	reqType.setDescription("Match");
+    	when(this.webClient.get()).thenReturn(this.requestHeadersUriMock);
+    	when(this.requestHeadersUriMock.uri(String.format(constants.getGradRequirementTypeByCode(), requirementType))).thenReturn(this.requestHeadersMock);
+        when(this.requestHeadersMock.headers(any(Consumer.class))).thenReturn(this.requestHeadersMock);
+        when(this.requestHeadersMock.retrieve()).thenReturn(this.responseMock);
+        when(this.responseMock.bodyToMono(GradRequirementTypes.class)).thenReturn(monoResponse);
+        when(this.monoResponse.block()).thenReturn(reqType); 
+        
+        Mockito.when(gradProgramRulesRepository.findAll()).thenReturn(gradProgramRuleList);
+		programManagementService.getAllProgramRulesList("accessToken");
+    }
+    
+    @Test
+    public void testGetAllProgramRulesList_emptyList() {
+        Mockito.when(gradProgramRulesRepository.findAll()).thenReturn(new ArrayList<>());
+		programManagementService.getAllProgramRulesList("accessToken");
+    }
+    
+    @Test
+    public void testGetAllSpecialProgramRulesList() {
+    	String requirementType="M";
+    	List<GradSpecialProgramRulesEntity> gradProgramRuleList = new ArrayList<GradSpecialProgramRulesEntity>();
+		GradSpecialProgramRulesEntity ruleObj = new GradSpecialProgramRulesEntity();
+		ruleObj.setSpecialProgramID(new UUID(1, 1));
+		ruleObj.setRuleCode("100");
+		ruleObj.setRequirementName("ABC");
+		ruleObj.setRequirementType("M");
+		gradProgramRuleList.add(ruleObj);
+		ruleObj = new GradSpecialProgramRulesEntity();
+		ruleObj.setSpecialProgramID(new UUID(1, 1));
+		ruleObj.setRuleCode("200");
+		ruleObj.setRequirementName("ABC");
+		ruleObj.setRequirementType("M");
+		gradProgramRuleList.add(ruleObj);
+		
+		GradSpecialProgramEntity obj = new GradSpecialProgramEntity();
+		obj.setId(new UUID(1, 1));
+		obj.setProgramCode("2018-EN");
+		obj.setSpecialProgramName("2018 Graduation Program");
+		obj.setSpecialProgramCode("FI");
+		
+		GradRequirementTypes reqType = new GradRequirementTypes();
+    	reqType.setCode("M");
+    	reqType.setDescription("Match");
+    	when(this.webClient.get()).thenReturn(this.requestHeadersUriMock);
+    	when(this.requestHeadersUriMock.uri(String.format(constants.getGradRequirementTypeByCode(), requirementType))).thenReturn(this.requestHeadersMock);
+        when(this.requestHeadersMock.headers(any(Consumer.class))).thenReturn(this.requestHeadersMock);
+        when(this.requestHeadersMock.retrieve()).thenReturn(this.responseMock);
+        when(this.responseMock.bodyToMono(GradRequirementTypes.class)).thenReturn(monoResponse);
+        when(this.monoResponse.block()).thenReturn(reqType); 
+        
+        Mockito.when(gradSpecialProgramRulesRepository.findAll()).thenReturn(gradProgramRuleList);
+        Mockito.when(gradSpecialProgramRepository.findById(new UUID(1, 1))).thenReturn(Optional.of(obj));
+		programManagementService.getAllSpecialProgramRulesList("accessToken");
+    }
+    
+    @Test
+    public void testGetAllSpecialProgramRulesList_emptyList() {
+        Mockito.when(gradProgramRulesRepository.findAll()).thenReturn(new ArrayList<>());
+		programManagementService.getAllSpecialProgramRulesList("accessToken");
+    }
 }
 
