@@ -61,6 +61,13 @@ public class ProgramManagementController {
     
     @Autowired
 	ResponseHelper response;
+    
+    private static final String PROGRAM_CODE="Program Code";
+    private static final String PROGRAM_NAME="Program Name";
+    private static final String SPECIAL_PROGRAM_ID="Special Program ID";
+    private static final String REQUIREMENT_TYPE = "Requirement Type";
+    private static final String RULE_CODE = "Rule Code";
+    private static final String REQUIREMENT_NAME = "Requirement Name";
 
     @GetMapping(value=EducGradProgramManagementApiConstants.GET_ALL_PROGRAM_MAPPING, produces= {"application/json"})
     @PreAuthorize(PermissionsContants.READ_GRAD_PROGRAM)
@@ -69,7 +76,7 @@ public class ProgramManagementController {
     public ResponseEntity<List<GradProgram>> getAllPrograms() { 
     	logger.debug("getAllPrograms : ");
     	List<GradProgram> programList = programManagementService.getAllProgramList();
-    	if(programList.size() > 0 ) {
+    	if(!programList.isEmpty()) {
     		return response.GET(programList,new TypeToken<List<GradProgram>>() {}.getType());
     	}
     	return response.NO_CONTENT();
@@ -94,8 +101,8 @@ public class ProgramManagementController {
     @ApiResponses(value = {@ApiResponse(responseCode = "200", description = "OK"), @ApiResponse(responseCode = "400", description = "BAD REQUEST.")})
     public ResponseEntity<ApiResponseModel<GradProgram>> createGradPrograms(@Valid @RequestBody GradProgram gradProgram) { 
     	logger.debug("createGradPrograms : ");
-    	validation.requiredField(gradProgram.getProgramCode(), "Program Code");
-       	validation.requiredField(gradProgram.getProgramName(), "Program Name");
+    	validation.requiredField(gradProgram.getProgramCode(), PROGRAM_CODE);
+       	validation.requiredField(gradProgram.getProgramName(), PROGRAM_NAME);
     	if(validation.hasErrors()) {
     		validation.stopOnErrors();
     		return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
@@ -109,8 +116,8 @@ public class ProgramManagementController {
     @ApiResponses(value = {@ApiResponse(responseCode = "200", description = "OK"), @ApiResponse(responseCode = "400", description = "BAD REQUEST.")})
     public ResponseEntity<ApiResponseModel<GradProgram>> updateGradPrograms(@Valid @RequestBody GradProgram gradProgram) { 
     	logger.info("updateGradProgramsss : ");
-    	validation.requiredField(gradProgram.getProgramCode(), "Program Code");
-      	validation.requiredField(gradProgram.getProgramName(), "Program Name");
+    	validation.requiredField(gradProgram.getProgramCode(), PROGRAM_CODE);
+      	validation.requiredField(gradProgram.getProgramName(), PROGRAM_NAME);
     	if(validation.hasErrors()) {
     		validation.stopOnErrors();
     		return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
@@ -124,7 +131,7 @@ public class ProgramManagementController {
     @ApiResponses(value = {@ApiResponse(responseCode = "204", description = "NO CONTENT"), @ApiResponse(responseCode = "404", description = "NOT FOUND.")})
     public ResponseEntity<Void> deleteGradPrograms(@Valid @PathVariable String programCode) { 
     	logger.debug("deleteGradPrograms : ");
-    	validation.requiredField(programCode, "Program Code");
+    	validation.requiredField(programCode, PROGRAM_CODE);
     	if(validation.hasErrors()) {
     		validation.stopOnErrors();
     		return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
@@ -144,7 +151,7 @@ public class ProgramManagementController {
     	OAuth2AuthenticationDetails auth = (OAuth2AuthenticationDetails) SecurityContextHolder.getContext().getAuthentication().getDetails(); 
     	String accessToken = auth.getTokenValue();
     	List<GradProgramRule> programRuleList = programManagementService.getAllProgramRuleList(programCode,requirementType,accessToken);
-    	if(programRuleList.size() > 0) {
+    	if(!programRuleList.isEmpty()) {
     		return response.GET(programRuleList,new TypeToken<List<GradProgramRule>>() {}.getType());
     	}
     	return response.NO_CONTENT();
@@ -156,10 +163,10 @@ public class ProgramManagementController {
     @ApiResponses(value = {@ApiResponse(responseCode = "200", description = "OK"), @ApiResponse(responseCode = "400", description = "BAD REQUEST")})
     public ResponseEntity<ApiResponseModel<GradProgramRule>> createGradProgramRules(@Valid @RequestBody GradProgramRule gradProgramRule) { 
     	logger.debug("createGradProgramRules : ");
-    	validation.requiredField(gradProgramRule.getProgramCode(), "Program Code");
-    	validation.requiredField(gradProgramRule.getRequirementType(), "Requirement Type");
-    	validation.requiredField(gradProgramRule.getRuleCode(), "Rule Code");
-    	validation.requiredField(gradProgramRule.getRequirementName(), "Requirement Name");
+    	validation.requiredField(gradProgramRule.getProgramCode(), PROGRAM_CODE);
+    	validation.requiredField(gradProgramRule.getRequirementType(), REQUIREMENT_TYPE);
+    	validation.requiredField(gradProgramRule.getRuleCode(), RULE_CODE);
+    	validation.requiredField(gradProgramRule.getRequirementName(), REQUIREMENT_NAME);
     	if(validation.hasErrors()) {
     		validation.stopOnErrors();
     		return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
@@ -175,10 +182,10 @@ public class ProgramManagementController {
     @ApiResponses(value = {@ApiResponse(responseCode = "200", description = "OK"), @ApiResponse(responseCode = "400", description = "BAD REQUEST.")})
     public ResponseEntity<ApiResponseModel<GradProgramRule>> updateGradProgramRules(@Valid @RequestBody GradProgramRule gradProgramRule) { 
     	logger.debug("updateGradProgramRules : ");
-    	validation.requiredField(gradProgramRule.getProgramCode(), "Program Code");
-    	validation.requiredField(gradProgramRule.getRequirementType(), "Requirement Type");
-    	validation.requiredField(gradProgramRule.getRuleCode(), "Rule Code");
-    	validation.requiredField(gradProgramRule.getRequirementName(), "Requirement Name");
+    	validation.requiredField(gradProgramRule.getProgramCode(), PROGRAM_CODE);
+    	validation.requiredField(gradProgramRule.getRequirementType(), REQUIREMENT_TYPE);
+    	validation.requiredField(gradProgramRule.getRuleCode(), RULE_CODE);
+    	validation.requiredField(gradProgramRule.getRequirementName(), REQUIREMENT_NAME);
     	if(validation.hasErrors()) {
     		validation.stopOnErrors();
     		return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
@@ -204,7 +211,7 @@ public class ProgramManagementController {
     public ResponseEntity<List<GradSpecialCase>> getAllSpecialCases() { 
     	logger.debug("getAllSpecialCases : ");
     	List<GradSpecialCase> specialList = programManagementService.getAllSpecialCaseList();
-    	if(specialList.size() > 0 ) {
+    	if(!specialList.isEmpty()) {
     		return response.GET(specialList,new TypeToken<List<GradSpecialCase>>() {}.getType());
     	}
     	return response.NO_CONTENT();
@@ -277,7 +284,7 @@ public class ProgramManagementController {
     public ResponseEntity<List<GradSpecialProgram>> getAllSpecialPrograms() { 
     	logger.debug("getAllSpecialPrograms : ");
     	List<GradSpecialProgram> specialProgramList = programManagementService.getAllSpecialProgramList();
-    	if(specialProgramList.size() > 0 ) {
+    	if(!specialProgramList.isEmpty()) {
     		return response.GET(specialProgramList,new TypeToken<List<GradSpecialProgram>>() {}.getType());
     	}
     	return response.NO_CONTENT();
@@ -290,7 +297,7 @@ public class ProgramManagementController {
     public ResponseEntity<List<GradSpecialProgram>> getAllSpecialPrograms(@PathVariable String programCode) { 
     	logger.debug("getAllSpecialPrograms : ");
     	List<GradSpecialProgram> specialProgramList = programManagementService.getAllSpecialProgramList(programCode);
-    	if(specialProgramList.size() > 0 ) {
+    	if(!specialProgramList.isEmpty()) {
     		return response.GET(specialProgramList,new TypeToken<List<GradSpecialProgram>>() {}.getType());
     	}
     	return response.NO_CONTENT();
@@ -311,9 +318,9 @@ public class ProgramManagementController {
     @PreAuthorize(PermissionsContants.CREATE_GRAD_SPECIAL_PROGRAM)
     @Operation(summary = "Create Special Program", description = "Create Special Program", tags = { "Special Programs" })
     @ApiResponses(value = {@ApiResponse(responseCode = "200", description = "OK"), @ApiResponse(responseCode = "400", description = "BAD REQUEST")})
-    public ResponseEntity<ApiResponseModel<GradSpecialProgram>> createGradSpecailPrograms(@Valid @RequestBody GradSpecialProgram gradSpecialProgram) { 
+    public ResponseEntity<ApiResponseModel<GradSpecialProgram>> createGradSpecialPrograms(@Valid @RequestBody GradSpecialProgram gradSpecialProgram) { 
     	logger.debug("createGradSpecailPrograms : ");
-    	validation.requiredField(gradSpecialProgram.getProgramCode(), "Program Code");
+    	validation.requiredField(gradSpecialProgram.getProgramCode(), PROGRAM_CODE);
        	validation.requiredField(gradSpecialProgram.getSpecialProgramCode(), "Special Program Code");
        	validation.requiredField(gradSpecialProgram.getSpecialProgramName(), "Special Program Name");
     	if(validation.hasErrors()) {
@@ -329,7 +336,7 @@ public class ProgramManagementController {
     @ApiResponses(value = {@ApiResponse(responseCode = "200", description = "OK"), @ApiResponse(responseCode = "400", description = "BAD REQUEST")})
     public ResponseEntity<ApiResponseModel<GradSpecialProgram>> updateGradSpecialPrograms(@Valid @RequestBody GradSpecialProgram gradSpecialProgram) { 
     	logger.info("updateGradProgramsss : ");
-    	validation.requiredField(gradSpecialProgram.getProgramCode(), "Program Code");
+    	validation.requiredField(gradSpecialProgram.getProgramCode(), PROGRAM_CODE);
        	validation.requiredField(gradSpecialProgram.getSpecialProgramCode(), "Special Program Code");
        	validation.requiredField(gradSpecialProgram.getSpecialProgramName(), "Special Program Name");
     	if(validation.hasErrors()) {
@@ -345,7 +352,7 @@ public class ProgramManagementController {
     @ApiResponses(value = {@ApiResponse(responseCode = "204", description = "NO CONTENT"), @ApiResponse(responseCode = "404", description = "NOT FOUND")})
     public ResponseEntity<Void> deleteGradSpecialPrograms(@PathVariable(value = "specialProgramID", required = true) String specialProgramID) { 
     	logger.debug("deleteGradPrograms : ");
-    	validation.requiredField(specialProgramID, "Special Program ID");
+    	validation.requiredField(specialProgramID, SPECIAL_PROGRAM_ID);
     	if(validation.hasErrors()) {
     		validation.stopOnErrors();
     		return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
@@ -364,7 +371,7 @@ public class ProgramManagementController {
     	OAuth2AuthenticationDetails auth = (OAuth2AuthenticationDetails) SecurityContextHolder.getContext().getAuthentication().getDetails(); 
     	String accessToken = auth.getTokenValue();
     	List<GradSpecialProgramRule> programRuleList = programManagementService.getAllSpecialProgramRuleList(UUID.fromString(specialProgramID),requirementType,accessToken);
-    	if(programRuleList.size() > 0) {
+    	if(!programRuleList.isEmpty()) {
     		return response.GET(programRuleList,new TypeToken<List<GradSpecialProgramRule>>() {}.getType());
     	}
     	return response.NO_CONTENT();
@@ -376,10 +383,10 @@ public class ProgramManagementController {
     @ApiResponses(value = {@ApiResponse(responseCode = "200", description = "OK"), @ApiResponse(responseCode = "400", description = "BAD REQUEST")})
     public ResponseEntity<ApiResponseModel<GradSpecialProgramRule>> createGradSpecialProgramRules(@Valid @RequestBody GradSpecialProgramRule gradSpecialProgramRule) { 
     	logger.debug("createGradSpecialProgramRules : ");
-    	validation.requiredField(gradSpecialProgramRule.getSpecialProgramID(), "Special Program ID");
-    	validation.requiredField(gradSpecialProgramRule.getRequirementType(), "Requirement Type");
-    	validation.requiredField(gradSpecialProgramRule.getRuleCode(), "Rule Code");
-    	validation.requiredField(gradSpecialProgramRule.getRequirementName(), "Requirement Name");
+    	validation.requiredField(gradSpecialProgramRule.getSpecialProgramID(), SPECIAL_PROGRAM_ID);
+    	validation.requiredField(gradSpecialProgramRule.getRequirementType(), REQUIREMENT_TYPE);
+    	validation.requiredField(gradSpecialProgramRule.getRuleCode(), RULE_CODE);
+    	validation.requiredField(gradSpecialProgramRule.getRequirementName(), REQUIREMENT_NAME);
     	if(validation.hasErrors()) {
     		validation.stopOnErrors();
     		return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
@@ -393,12 +400,12 @@ public class ProgramManagementController {
     @PreAuthorize(PermissionsContants.UPDATE_GRAD_SPECIAL_PROGRAM_RULES)
     @Operation(summary = "Update Special Program Rules", description = "Update Special Program Rules", tags = { "Special Program Rules" })
     @ApiResponses(value = {@ApiResponse(responseCode = "200", description = "OK"), @ApiResponse(responseCode = "400", description = "BAD REQUEST")})
-    public ResponseEntity<ApiResponseModel<GradSpecialProgramRule>> updateGradProgramRules(@Valid @RequestBody GradSpecialProgramRule gradSpecialProgramRule) { 
+    public ResponseEntity<ApiResponseModel<GradSpecialProgramRule>> updateGradSpecialProgramRules(@Valid @RequestBody GradSpecialProgramRule gradSpecialProgramRule) { 
     	logger.debug("updateGradProgramRules : ");
-    	validation.requiredField(gradSpecialProgramRule.getSpecialProgramID(), "Special Program ID");
-    	validation.requiredField(gradSpecialProgramRule.getRequirementType(), "Requirement Type");
-    	validation.requiredField(gradSpecialProgramRule.getRuleCode(), "Rule Code");
-    	validation.requiredField(gradSpecialProgramRule.getRequirementName(), "Requirement Name");
+    	validation.requiredField(gradSpecialProgramRule.getSpecialProgramID(), SPECIAL_PROGRAM_ID);
+    	validation.requiredField(gradSpecialProgramRule.getRequirementType(), REQUIREMENT_TYPE);
+    	validation.requiredField(gradSpecialProgramRule.getRuleCode(), RULE_CODE);
+    	validation.requiredField(gradSpecialProgramRule.getRequirementName(), REQUIREMENT_NAME);
     	if(validation.hasErrors()) {
     		validation.stopOnErrors();
     		return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
@@ -414,7 +421,7 @@ public class ProgramManagementController {
     @ApiResponses(value = {@ApiResponse(responseCode = "204", description = "NO CONTENT"), @ApiResponse(responseCode = "404", description = "NOT FOUND")})
     public ResponseEntity<Void> deleteGradSpecialProgramRules(@PathVariable(value = "programRuleID", required = true) String programRuleID) { 
     	logger.debug("deleteGradProgramRules : ");    	
-        return response.DELETE(programManagementService.deleteGradSpecailProgramRules(UUID.fromString(programRuleID)));
+        return response.DELETE(programManagementService.deleteGradSpecialProgramRules(UUID.fromString(programRuleID)));
     }
     
     @GetMapping(EducGradProgramManagementApiConstants.GET_SPECIAL_PROGRAM_RULES_BY_PROGRAM_CODE_AND_SPECIAL_PROGRAM_CODE)
@@ -429,7 +436,7 @@ public class ProgramManagementController {
     	OAuth2AuthenticationDetails auth = (OAuth2AuthenticationDetails) SecurityContextHolder.getContext().getAuthentication().getDetails(); 
     	String accessToken = auth.getTokenValue();
     	List<GradSpecialProgramRule> programRuleList = programManagementService.getSpecialProgramRulesByProgramCodeAndSpecialProgramCode(programCode,specialProgramCode,requirementType,accessToken);
-    	if(programRuleList.size() > 0) {
+    	if(!programRuleList.isEmpty()) {
     		return response.GET(programRuleList,new TypeToken<List<GradSpecialProgramRule>>() {}.getType());
     	}
     	return response.NO_CONTENT();
@@ -446,7 +453,7 @@ public class ProgramManagementController {
     	OAuth2AuthenticationDetails auth = (OAuth2AuthenticationDetails) SecurityContextHolder.getContext().getAuthentication().getDetails(); 
     	String accessToken = auth.getTokenValue();
     	List<GradSpecialProgramRule> programRuleList = programManagementService.getSpecialProgramRulesByProgramCodeAndSpecialProgramCode(programCode,specialProgramCode,null,accessToken);
-    	if(programRuleList.size() > 0) {
+    	if(!programRuleList.isEmpty()) {
     		return response.GET(programRuleList,new TypeToken<List<GradSpecialProgramRule>>() {}.getType());
     	}
     	return response.NO_CONTENT();
@@ -461,7 +468,7 @@ public class ProgramManagementController {
     	OAuth2AuthenticationDetails auth = (OAuth2AuthenticationDetails) SecurityContextHolder.getContext().getAuthentication().getDetails(); 
     	String accessToken = auth.getTokenValue();
     	List<GradProgramRule> programRuleList = programManagementService.getAllProgramRulesList(accessToken);
-    	if(programRuleList.size() > 0) {
+    	if(!programRuleList.isEmpty()) {
     		return response.GET(programRuleList,new TypeToken<List<GradProgramRule>>() {}.getType());
     	}
     	return response.NO_CONTENT();
@@ -476,7 +483,7 @@ public class ProgramManagementController {
     	OAuth2AuthenticationDetails auth = (OAuth2AuthenticationDetails) SecurityContextHolder.getContext().getAuthentication().getDetails(); 
     	String accessToken = auth.getTokenValue();
     	List<GradSpecialProgramRule> programRuleList = programManagementService.getAllSpecialProgramRulesList(accessToken);
-    	if(programRuleList.size() > 0) {
+    	if(!programRuleList.isEmpty()) {
     		return response.GET(programRuleList,new TypeToken<List<GradSpecialProgramRule>>() {}.getType());
     	}
     	return response.NO_CONTENT();
